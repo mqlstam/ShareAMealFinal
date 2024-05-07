@@ -2,22 +2,22 @@ const userDao = require('../dao/user.dao');
 
 const userService = {
   create: (user, callback) => {
-    // Implementation here
+    userDao.create(user, callback);
   },
   getAll: (callback) => {
-    // Implementation here
+    userDao.getAll(callback);
   },
   getById: (id, callback) => {
-    // Implementation here
+    userDao.getById(id, callback);
   },
-  update: (user, callback) => {
-    // Implementation here
+  update: (id, updatedUser, callback) => {
+    userDao.update(id, updatedUser, callback);
   },
   delete: (id, callback) => {
-    // Implementation here
+    userDao.delete(id, callback);
   },
   getProfile: (userId, callback) => {
-    // Implementation here
+    userDao.getById(userId, callback);
   }
 };
 

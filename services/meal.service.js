@@ -2,31 +2,51 @@ const mealDao = require('../dao/meal.dao');
 
 const mealService = {
   create: (meal, callback) => {
-    // Implementation here
+    mealDao.create(meal, callback);
   },
   getAll: (callback) => {
-    // Implementation here
+    mealDao.getAll(callback);
   },
   getById: (id, callback) => {
-    // Implementation here
+    mealDao.getById(id, callback);
   },
-  update: (meal, callback) => {
-    // Implementation here
+  update: (id, updatedMeal, callback) => {
+    mealDao.update(id, updatedMeal, callback);
   },
   delete: (id, callback) => {
-    // Implementation here
+    mealDao.delete(id, callback);
   },
   participate: (userId, mealId, callback) => {
-    // Implementation here
+    mealDao.participate(userId, mealId, (error, data) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, data);
+    });
   },
   cancelParticipation: (userId, mealId, callback) => {
-    // Implementation here
+    mealDao.cancelParticipation(userId, mealId, (error, data) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, data);
+    });
   },
   getParticipants: (mealId, callback) => {
-    // Implementation here
+    mealDao.getParticipants(mealId, (error, data) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, data);
+    });
   },
   getParticipantDetails: (mealId, participantId, callback) => {
-    // Implementation here
+    mealDao.getParticipantDetails(mealId, participantId, (error, data) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, data);
+    });
   }
 };
 
