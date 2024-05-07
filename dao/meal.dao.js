@@ -83,6 +83,67 @@ const mealDao = {
       }
       callback(null, { message: 'Meal deleted successfully' });
     });
+  },
+  participate: (userId, mealId, callback) => {
+    const query = 'INSERT INTO meal_participant (userId, mealId) VALUES (?, ?)';
+    const values = [userId, mealId];
+
+    db.query(query, values, (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, { message: `User ${userId} has joined meal ${mealId}` });
+    });
+  },
+
+  cancelParticipation: (userId, mealId, callback) => {
+    const query = 'DELETE FROM meal_participant WHERE userId = ? AND mealId = ?';
+    const values = [userId, mealId];
+
+    db.query(query, values, (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      if (result.affectedRows === 0) {
+        return callback({ message: 'User is not a participant of this meal' }, null);
+      }
+      callback(null, { message: `User ${userId} has cancelled participation for meal ${mealId}` });
+    });
+  },
+
+  getParticipants: (mealId, callback) => {
+    const query = `
+      SELECT u.id, u.firstName, u.lastName, u.emailAdress
+      FROM meal_participant mp
+      JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ?
+    `;
+
+    db.query(query, [mealId], (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
+  },
+
+  getParticipantDetails: (mealId, participantId, callback) => {
+    const query = `
+      SELECT u.id, u.firstName, u.lastName, u.emailAdress, u.phoneNumber, u.street, u.city
+      FROM meal_participant mp
+      JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ? AND u.id = ?
+    `;
+
+    db.query(query, [mealId, participantId], (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      if (result.length === 0) {
+        return callback({ message: 'Participant not found' }, null);
+      }
+      callback(null, result[0]);
+    });
   }
 };
 

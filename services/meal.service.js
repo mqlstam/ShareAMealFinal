@@ -17,36 +17,45 @@ const mealService = {
     mealDao.delete(id, callback);
   },
   participate: (userId, mealId, callback) => {
-    mealDao.participate(userId, mealId, (error, data) => {
+    // Check if the meal exists
+    mealDao.getById(mealId, (error, meal) => {
       if (error) {
         return callback(error, null);
       }
-      callback(null, data);
+      if (!meal) {
+        return callback({ message: 'Meal not found' }, null);
+      }
+
+      // Check if the maximum number of participants has been reached
+      if (meal.participants && meal.participants.length >= meal.maxAmountOfParticipants) {
+        return callback({ message: 'Maximum number of participants reached' }, null);
+      }
+
+      // Add the participant
+      mealDao.participate(userId, mealId, callback);
     });
   },
   cancelParticipation: (userId, mealId, callback) => {
-    mealDao.cancelParticipation(userId, mealId, (error, data) => {
+    // Check if the user is a participant of the meal
+    mealDao.getParticipants(mealId, (error, participants) => {
       if (error) {
         return callback(error, null);
       }
-      callback(null, data);
+
+      const isParticipant = participants.some(p => p.id === userId);
+      if (!isParticipant) {
+        return callback({ message: 'User is not a participant of this meal' }, null);
+      }
+
+      // Cancel the participation
+      mealDao.cancelParticipation(userId, mealId, callback);
     });
   },
   getParticipants: (mealId, callback) => {
-    mealDao.getParticipants(mealId, (error, data) => {
-      if (error) {
-        return callback(error, null);
-      }
-      callback(null, data);
-    });
+    mealDao.getParticipants(mealId, callback);
   },
   getParticipantDetails: (mealId, participantId, callback) => {
-    mealDao.getParticipantDetails(mealId, participantId, (error, data) => {
-      if (error) {
-        return callback(error, null);
-      }
-      callback(null, data);
-    });
+    mealDao.getParticipantDetails(mealId, participantId, callback);
   }
 };
 
