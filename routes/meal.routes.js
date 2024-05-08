@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const mealController = require('../controllers/meal.controller');
+const authenticate = require('../middleware/auth');
+const { validateMeal } = require('../middleware/validate');
+
 
 router.post('/meals', authenticate, validateMeal, mealController.create);
 router.get('/meals', mealController.getAll);
