@@ -45,22 +45,9 @@ const mealDao = {
       callback(null, result[0]);
     });
   },
-  update: (id, meal, callback) => {
-    const query = 'UPDATE meal SET name = ?, description = ?, imageUrl = ?, price = ?, dateTime = ?, maxAmountOfParticipants = ?, isActive = ?, isVega = ?, isVegan = ?, isToTakeHome = ?, cookId = ? WHERE id = ?';
-    const values = [
-      meal.name,
-      meal.description,
-      meal.imageUrl,
-      meal.price,
-      meal.dateTime,
-      meal.maxAmountOfParticipants,
-      meal.isActive,
-      meal.isVega,
-      meal.isVegan,
-      meal.isToTakeHome,
-      meal.cookId,
-      id
-    ];
+  update: function(id, meal, callback) {
+    const query = 'UPDATE meal SET ? WHERE id = ?';
+    const values = [meal, id];
 
     db.query(query, values, (error, result) => {
       if (error) {

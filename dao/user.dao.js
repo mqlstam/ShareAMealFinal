@@ -31,6 +31,7 @@ const userDao = {
     });
   },
   getById: (id, callback) => {
+    console.log('id', id);
     const query = 'SELECT * FROM user WHERE id = ?';
     db.query(query, [id], (error, result) => {
       if (error) {

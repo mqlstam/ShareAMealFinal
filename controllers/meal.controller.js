@@ -4,6 +4,7 @@ const mealService = require('../services/meal.service');
 const mealController = {
   create: (req, res, next) => {
     const meal = req.body;
+    console.log(meal);
 
     // Log the incoming request data
     logger.info(`Creating new meal: ${meal.name}`);

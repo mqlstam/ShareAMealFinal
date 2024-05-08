@@ -110,31 +110,34 @@ const userController = {
     });
   },
   getProfile: (req, res, next) => {
+    
     const userId = req.user.userId;
-
+  
+    // Ensure userId is a number
+    if (typeof userId !== 'number') {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+  
     // Log the incoming request
-    logger.info(`Retrieving user profile: ${req.user.userId}`);
-    logger.info(`Retrieving user: ${userId}`); // Log the userId
-
-
+    logger.info(`Retrieving user profile: ${userId}`);
+  
     userService.getProfile(userId, (error, data) => {
       if (error) {
         // Log the error
         logger.error(`Error retrieving user: ${JSON.stringify(error)}`);
         return next(error);
       }
-
+  
       if (!data) {
         // Log the error
         logger.warn(`User not found: ${userId}`);
         return res.status(404).json({ message: 'User not found' });
       }
-
+  
       // Log the successful operation
       logger.info(`User profile retrieved: ${userId}`);
       res.status(200).json(data);
     });
   }
 };
-
 module.exports = userController;
