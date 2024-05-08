@@ -1,4 +1,6 @@
 // config.js
-const secretKey = process.env.SECRET_KEY || 'your-secret-key';
-
-module.exports = { secretKey };
+const config = {
+    secretkey: 'your_secret_key'
+  };
+  
+  module.exports = config;

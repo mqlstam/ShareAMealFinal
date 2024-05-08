@@ -1,3 +1,5 @@
+// auth.js
+
 const jwt = require('jsonwebtoken');
 const config = require('../util/config');
 
@@ -10,6 +12,7 @@ const authenticate = (req, res, next) => {
 
   jwt.verify(token, config.secretKey, (err, decoded) => {
     if (err) {
+      console.log(err);
       return res.status(403).json({ message: 'Failed to authenticate token' });
     }
 
