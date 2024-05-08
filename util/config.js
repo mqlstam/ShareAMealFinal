@@ -1,6 +1,8 @@
-// config.js
+// util/config.js
+require('dotenv').config();
+
 const config = {
-    secretkey: 'your_secret_key'
-  };
-  
-  module.exports = config;
+  secretKey: process.env.SECRET_KEY
+};
+
+module.exports = config;

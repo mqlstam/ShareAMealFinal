@@ -1,0 +1,803 @@
+{
+    "info": {
+        "_postman_id": "d9a75cf1-ba8b-4758-8c26-d8cde9ad124d",
+        "name": "Share-a-Meal API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has token\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.token).to.be.a('string');",
+                                    "});",
+                                    "",
+                                    "// Save the token for future requests",
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set(\"token\", jsonData.data.token);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"emailAddress\": \"john.doe@example.com\",\n    \"password\": \"Password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 201\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('firstName');",
+                                    "    pm.expect(jsonData.data).to.have.property('lastName');",
+                                    "    pm.expect(jsonData.data).to.have.property('emailAddress');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"emailAddress\": \"john.doe@example.com\",\n    \"password\": \"Password123\",\n    \"phoneNumber\": \"0612345678\",\n    \"roles\": \"guest\",\n    \"street\": \"123 Main St\",\n    \"city\": \"Anytown\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Users",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User Profile",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('firstName');",
+                                    "    pm.expect(jsonData.data).to.have.property('lastName');",
+                                    "    pm.expect(jsonData.data).to.have.property('emailAddress');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "profile"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('firstName');",
+                                    "    pm.expect(jsonData.data).to.have.property('lastName');",
+                                    "    pm.expect(jsonData.data).to.have.property('emailAddress');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has updated user data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('firstName', 'Updated');",
+                                    "    pm.expect(jsonData.data).to.have.property('lastName', 'User');",
+                                    "    pm.expect(jsonData.data).to.have.property('emailAddress', 'updated@example.com');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"Updated\",\n    \"lastName\": \"User\",\n    \"emailAddress\": \"updated@example.com\",\n    \"password\": \"newpassword\",\n    \"phoneNumber\": \"0987654321\",\n    \"roles\": \"guest\",\n    \"street\": \"456 Update St\",\n    \"city\": \"Updateville\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/users/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 204\", function () {",
+                                    "    pm.response.to.have.status(204);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has success message\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.contain('User deleted successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Meals",
+            "item": [
+                {
+                    "name": "Create Meal",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 201\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has meal data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "    pm.expect(jsonData.data).to.have.property('description');",
+                                    "    pm.expect(jsonData.data).to.have.property('price');",
+                                    "    pm.expect(jsonData.data).to.have.property('dateTime');",
+                                    "    pm.expect(jsonData.data).to.have.property('maxAmountOfParticipants');",
+                                    "    pm.expect(jsonData.data).to.have.property('imageUrl');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Delicious Meal\",\n    \"description\": \"A tasty and healthy meal\",\n    \"imageUrl\": \"https://example.com/meal.jpg\",\n    \"price\": 10.99,\n    \"dateTime\": \"2023-06-01T18:00:00Z\",\n    \"maxAmountOfParticipants\": 5,\n    \"isActive\": true,\n    \"isVega\": false,\n    \"isVegan\": true,\n    \"isToTakeHome\": false,\n    \"cookId\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/meals",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Meals",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has meal data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Meal by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has meal data\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "    pm.expect(jsonData.data).to.have.property('description');",
+                                    "    pm.expect(jsonData.data).to.have.property('price');",
+                                    "    pm.expect(jsonData.data).to.have.property('dateTime');",
+									"    pm.expect(jsonData.data).to.have.property('maxAmountOfParticipants');",
+                                    "       pm.expect(jsonData.data).to.have.property('imageUrl');",
+" pm.expect(jsonData.data).to.have.property('cook');",
+" pm.expect(jsonData.data).to.have.property('participants');",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Meal",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    " pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has updated meal data', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.data).to.have.property('id');",
+                                    " pm.expect(jsonData.data).to.have.property('name', 'Updated Meal');",
+                                    " pm.expect(jsonData.data).to.have.property('price', 12.99);",
+                                    " pm.expect(jsonData.data).to.have.property('maxAmountOfParticipants', 10);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n 'name': 'Updated Meal',\n 'price': 12.99,\n 'maxAmountOfParticipants': 10\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Meal",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 204', function () {",
+                                    " pm.response.to.have.status(204);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.message).to.contain('Meal deleted successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Participate",
+            "item": [
+                {
+                    "name": "Participate in Meal",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    " pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.message).to.contain('User with ID #userId is aangemeld voor maaltijd met ID #mealId');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1/participate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1",
+                                "participate"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cancel Participation",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    " pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.message).to.contain('User with ID #userId is afgemeld voor maaltijd met ID #mealId');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1/participate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1",
+                                "participate"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Participants",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    " pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has participants data', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.data).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1/participants",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1",
+                                "participants"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Participant Details",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    " pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has participant details', function () {",
+                                    " var jsonData = pm.response.json();",
+                                    " pm.expect(jsonData.data).to.have.property('id');",
+                                    " pm.expect(jsonData.data).to.have.property('firstName');",
+                                    " pm.expect(jsonData.data).to.have.property('lastName');",
+                                    " pm.expect(jsonData.data).to.have.property('emailAddress');",
+                                    " pm.expect(jsonData.data).to.have.property('phoneNumber');",
+                                    " pm.expect(jsonData.data).to.have.property('street');",
+                                    " pm.expect(jsonData.data).to.have.property('city');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meals/1/participants/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "meals",
+                                "1",
+                                "participants",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

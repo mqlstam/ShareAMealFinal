@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const userDao = require('../dao/user.dao');
-const config = require('../util/config');
+const config = require('../util/config'); 
 
 const authService = {
   login: (emailAddress, password, callback) => {
@@ -13,7 +13,7 @@ const authService = {
         return callback({ message: 'Invalid email or password' }, null);
       }
 
-      const token = jwt.sign({ userId: user.id }, config.secretkey, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id }, config.secretKey, { expiresIn: '1h' }); 
       callback(null, { token });
     });
   }
