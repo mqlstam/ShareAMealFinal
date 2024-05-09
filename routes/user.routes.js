@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const userController = require('../controllers/user.controller');
-const authenticate = require('../middleware/auth');
-const { validationResult } = require('express-validator');
+const userController = require("../controllers/user.controller");
+const authenticate = require("../middleware/auth");
+const { validationResult } = require("express-validator");
 const {
   createUserValidationRules,
   updateUserValidationRules,
   getUserValidationRules,
-} = require('../validators/user.validator');
+} = require("../validators/user.validator");
 
 // Custom middleware to handle validation errors
 const validateRequest = (req, res, next) => {
@@ -18,34 +18,34 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
+router.get("/users/profile", authenticate, userController.getProfile);
 router.post(
-  '/users',
+  "/users",
   createUserValidationRules(),
   validateRequest,
   userController.create
 );
-router.get('/users', authenticate, userController.getAll);
+router.get("/users", authenticate, userController.getAll);
 router.get(
-  '/users/:userId',
+  "/users/:userId",
   authenticate,
   getUserValidationRules(),
   validateRequest,
   userController.getById
 );
 router.put(
-  '/users/:userId',
+  "/users/:userId",
   authenticate,
   updateUserValidationRules(),
   validateRequest,
   userController.update
 );
 router.delete(
-  '/users/:userId',
+  "/users/:userId",
   authenticate,
   getUserValidationRules(),
   validateRequest,
   userController.delete
 );
-router.get('/users/profile', authenticate, userController.getProfile);
 
 module.exports = router;
