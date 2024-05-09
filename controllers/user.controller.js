@@ -63,6 +63,12 @@ const userController = {
   update: (req, res, next) => {
     const userId = req.params.userId;
     const updatedUser = req.body;
+    const authenticatedUserId = req.user.userId;
+
+    // Check if the authenticated user is trying to update their own data
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ message: 'You are not authorized to update this user' });
+    }
 
     // Log the incoming request
     logger.info(`Updating user: ${userId}`);
@@ -85,8 +91,15 @@ const userController = {
       res.status(200).json(data);
     });
   },
+
   delete: (req, res, next) => {
     const userId = req.params.userId;
+    const authenticatedUserId = req.user.userId;
+
+    // Check if the authenticated user is trying to delete their own data
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ message: 'You are not authorized to delete this user' });
+    }
 
     // Log the incoming request
     logger.info(`Deleting user: ${userId}`);

@@ -56,7 +56,10 @@ const mealService = {
   },
   getParticipantDetails: (mealId, participantId, callback) => {
     mealDao.getParticipantDetails(mealId, participantId, callback);
-  }
+  },
+  getCookId: (mealId, callback) => {
+    mealDao.getCookId(mealId, callback);
+  },
 };
 
 module.exports = mealService;

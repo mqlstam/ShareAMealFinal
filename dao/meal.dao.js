@@ -131,7 +131,20 @@ const mealDao = {
       }
       callback(null, result[0]);
     });
-  }
+  },
+  getCookId: (mealId, callback) => {
+    const query = 'SELECT cookId FROM meal WHERE id = ?';
+    db.query(query, [mealId], (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      if (result.length === 0) {
+        return callback({ message: 'Meal not found' }, null);
+      }
+      callback(null, result[0].cookId);
+    });
+  },
+
 };
 
 module.exports = mealDao;

@@ -64,50 +64,75 @@ const mealController = {
   update: (req, res, next) => {
     const mealId = req.params.mealId;
     const updatedMeal = req.body;
+    const authenticatedUserId = req.user.userId;
 
-    // Log the incoming request
-    logger.info(`Updating meal: ${mealId}`);
-
-    mealService.update(mealId, updatedMeal, (error, data) => {
+    // Check if the authenticated user is the cook of the meal
+    mealService.getCookId(mealId, (error, cookId) => {
       if (error) {
-        // Log the error
-        logger.error(`Error updating meal: ${error.message}`);
         return next(error);
       }
 
-      if (!data) {
-        // Log the error
-        logger.warn(`Meal not found: ${mealId}`);
-        return res.status(404).json({ message: 'Meal not found' });
+      if (cookId !== authenticatedUserId) {
+        return res.status(403).json({ message: 'You are not authorized to update this meal' });
       }
 
-      // Log the successful operation
-      logger.info(`Meal updated: ${mealId}`);
-      res.status(200).json(data);
+      // Log the incoming request
+      logger.info(`Updating meal: ${mealId}`);
+
+      mealService.update(mealId, updatedMeal, (error, data) => {
+        if (error) {
+          // Log the error
+          logger.error(`Error updating meal: ${error.message}`);
+          return next(error);
+        }
+
+        if (!data) {
+          // Log the error
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ message: 'Meal not found' });
+        }
+
+        // Log the successful operation
+        logger.info(`Meal updated: ${mealId}`);
+        res.status(200).json(data);
+      });
     });
   },
+
   delete: (req, res, next) => {
     const mealId = req.params.mealId;
+    const authenticatedUserId = req.user.userId;
 
-    // Log the incoming request
-    logger.info(`Deleting meal: ${mealId}`);
-
-    mealService.delete(mealId, (error, data) => {
+    // Check if the authenticated user is the cook of the meal
+    mealService.getCookId(mealId, (error, cookId) => {
       if (error) {
-        // Log the error
-        logger.error(`Error deleting meal: ${error.message}`);
         return next(error);
       }
 
-      if (!data) {
-        // Log the error
-        logger.warn(`Meal not found: ${mealId}`);
-        return res.status(404).json({ message: 'Meal not found' });
+      if (cookId !== authenticatedUserId) {
+        return res.status(403).json({ message: 'You are not authorized to delete this meal' });
       }
 
-      // Log the successful operation
-      logger.info(`Meal deleted: ${mealId}`);
-      res.status(204).json(data);
+      // Log the incoming request
+      logger.info(`Deleting meal: ${mealId}`);
+
+      mealService.delete(mealId, (error, data) => {
+        if (error) {
+          // Log the error
+          logger.error(`Error deleting meal: ${error.message}`);
+          return next(error);
+        }
+
+        if (!data) {
+          // Log the error
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ message: 'Meal not found' });
+        }
+
+        // Log the successful operation
+        logger.info(`Meal deleted: ${mealId}`);
+        res.status(204).json(data);
+      });
     });
   },
   participate: (req, res, next) => {
