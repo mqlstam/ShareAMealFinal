@@ -90,6 +90,38 @@ const userDao = {
       }
       callback(null, result[0]);
     });
+  },
+
+  getAllFiltered: (filters, callback) => {
+    let query = 'SELECT * FROM user';
+    const values = [];
+
+    if (filters.firstName) {
+      query += ' WHERE firstName LIKE ?';
+      values.push(`%${filters.firstName}%`);
+    }
+
+    if (filters.lastName) {
+      query += (values.length > 0 ? ' AND lastName LIKE ?' : ' WHERE lastName LIKE ?');
+      values.push(`%${filters.lastName}%`);
+    }
+
+    if (filters.emailAddress) {
+      query += (values.length > 0 ? ' AND emailAddress LIKE ?' : ' WHERE emailAddress LIKE ?');
+      values.push(`%${filters.emailAddress}%`);
+    }
+
+    if (filters.roles) {
+      query += (values.length > 0 ? ' AND roles = ?' : ' WHERE roles = ?');
+      values.push(filters.roles);
+    }
+
+    db.query(query, values, (error, result) => {
+      if (error) {
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
   }
 };
 

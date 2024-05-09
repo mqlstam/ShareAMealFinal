@@ -17,7 +17,14 @@ const createUserValidationRules = () => [
     .isLength({ min: 8 })
     .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).*$/)
     .withMessage('Invalid password: Must be at least 8 characters, include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)'),
-  // Add more validation rules for other fields
+  body('phoneNumber')
+    .optional() 
+    .isMobilePhone('any')
+    .withMessage('Invalid phone number format'),
+  body('roles')
+    .optional() 
+    .isIn(['guest', 'cook', 'admin'])
+    .withMessage('Invalid role. Role must be one of: guest, cook, admin'),
 ];
 
 const updateUserValidationRules = () => [
@@ -41,8 +48,17 @@ const updateUserValidationRules = () => [
     .isLength({ min: 8 })
     .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).*$/)
     .withMessage('Invalid password: Must be at least 8 characters, include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)'),
-  // Add more validation rules for other fields
+  body('phoneNumber')
+    .optional()
+    .isMobilePhone('any')
+    .withMessage('Invalid phone number format'),
+
+  body('roles')
+    .optional()
+    .isIn(['guest', 'cook', 'admin'])
+    .withMessage('Invalid role. Role must be one of: guest, cook, admin'),
 ];
+
 
 const getUserValidationRules = () => [
   param('userId')

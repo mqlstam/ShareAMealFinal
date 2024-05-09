@@ -13,7 +13,21 @@ const createMealValidationRules = () => [
     .isNumeric()
     .isFloat({ min: 0.01, max: 10000 })
     .withMessage('Invalid meal price: Must be a positive number not exceeding 10,000'),
-  // Add more validation rules for other fields
+  body('isActive')
+    .isBoolean()
+    .withMessage('Invalid value for isActive: Must be a boolean'),
+
+  body('isVega')
+    .isBoolean()
+    .withMessage('Invalid value for isVega: Must be a boolean'),
+
+  body('isVegan')
+    .isBoolean()
+    .withMessage('Invalid value for isVegan: Must be a boolean'),
+
+  body('isToTakeHome')
+    .isBoolean()
+    .withMessage('Invalid value for isToTakeHome: Must be a boolean'),
 ];
 
 const updateMealValidationRules = () => [
@@ -32,7 +46,25 @@ const updateMealValidationRules = () => [
     .isNumeric()
     .isFloat({ min: 0.01, max: 10000 })
     .withMessage('Invalid meal price: Must be a positive number not exceeding 10,000'),
-  // Add more validation rules for other fields
+    body('isActive')
+    .optional()
+    .isBoolean()
+    .withMessage('Invalid value for isActive: Must be a boolean'),
+
+  body('isVega')
+    .optional()
+    .isBoolean()
+    .withMessage('Invalid value for isVega: Must be a boolean'),
+
+  body('isVegan')
+    .optional()
+    .isBoolean()
+    .withMessage('Invalid value for isVegan: Must be a boolean'),
+
+  body('isToTakeHome')
+    .optional()
+    .isBoolean()
+    .withMessage('Invalid value for isToTakeHome: Must be a boolean'),
 ];
 
 const getMealValidationRules = () => [

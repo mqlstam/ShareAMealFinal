@@ -21,10 +21,17 @@ const userController = {
     });
   },
   getAll: (req, res, next) => {
-    // Log the incoming request
-    logger.info('Retrieving all users');
+    const filters = {
+      firstName: req.query.firstName,
+      lastName: req.query.lastName,
+      emailAddress: req.query.emailAddress,
+      roles: req.query.roles
+    };
 
-    userService.getAll((error, data) => {
+    // Log the incoming request
+    logger.info('Retrieving users with filters', filters);
+
+    userService.getAllFiltered(filters, (error, data) => {
       if (error) {
         // Log the error
         logger.error(`Error retrieving users: ${error.message}`);

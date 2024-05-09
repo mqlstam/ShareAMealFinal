@@ -2,63 +2,107 @@ const mealDao = require('../dao/meal.dao');
 
 const mealService = {
   create: (meal, callback) => {
-    mealDao.create(meal, callback);
+    try {
+      mealDao.create(meal, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   getAll: (callback) => {
-    mealDao.getAll(callback);
+    try {
+      mealDao.getAll(callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   getById: (id, callback) => {
-    mealDao.getById(id, callback);
+    try {
+      mealDao.getById(id, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   update: (id, updatedMeal, callback) => {
-    mealDao.update(id, updatedMeal, callback);
+    try {
+      mealDao.update(id, updatedMeal, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   delete: (id, callback) => {
-    mealDao.delete(id, callback);
+    try {
+      mealDao.delete(id, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   participate: (userId, mealId, callback) => {
-    // Check if the meal exists
-    mealDao.getById(mealId, (error, meal) => {
-      if (error) {
-        return callback(error, null);
-      }
-      if (!meal) {
-        return callback({ message: 'Meal not found' }, null);
-      }
+    try {
+      mealDao.getById(mealId, (error, meal) => {
+        if (error) {
+          return callback(error, null);
+        }
+        if (!meal) {
+          return callback({ message: 'Meal not found' }, null);
+        }
 
-      // Check if the maximum number of participants has been reached
-      if (meal.participants && meal.participants.length >= meal.maxAmountOfParticipants) {
-        return callback({ message: 'Maximum number of participants reached' }, null);
-      }
+        if (meal.participants && meal.participants.length >= meal.maxAmountOfParticipants) {
+          return callback({ message: 'Maximum number of participants reached' }, null);
+        }
 
-      // Add the participant
-      mealDao.participate(userId, mealId, callback);
-    });
+        mealDao.participate(userId, mealId, callback);
+      });
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   cancelParticipation: (userId, mealId, callback) => {
-    // Check if the user is a participant of the meal
-    mealDao.getParticipants(mealId, (error, participants) => {
-      if (error) {
-        return callback(error, null);
-      }
+    try {
+      mealDao.getParticipants(mealId, (error, participants) => {
+        if (error) {
+          return callback(error, null);
+        }
 
-      const isParticipant = participants.some(p => p.id === userId);
-      if (!isParticipant) {
-        return callback({ message: 'User is not a participant of this meal' }, null);
-      }
+        const isParticipant = participants.some(p => p.id === userId);
+        if (!isParticipant) {
+          return callback({ message: 'User is not a participant of this meal' }, null);
+        }
 
-      // Cancel the participation
-      mealDao.cancelParticipation(userId, mealId, callback);
-    });
+        mealDao.cancelParticipation(userId, mealId, callback);
+      });
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   getParticipants: (mealId, callback) => {
-    mealDao.getParticipants(mealId, callback);
+    try {
+      mealDao.getParticipants(mealId, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   getParticipantDetails: (mealId, participantId, callback) => {
-    mealDao.getParticipantDetails(mealId, participantId, callback);
+    try {
+      mealDao.getParticipantDetails(mealId, participantId, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
+
   getCookId: (mealId, callback) => {
-    mealDao.getCookId(mealId, callback);
+    try {
+      mealDao.getCookId(mealId, callback);
+    } catch (error) {
+      callback(error, null);
+    }
   },
 };
 

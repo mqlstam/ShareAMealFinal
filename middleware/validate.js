@@ -59,7 +59,7 @@ const validateMeal = (req, res, next) => {
 
   // Validate dateTime
   const parsedDateTime = new Date(dateTime);
-  if (!dateTime || !(parsedDateTime instanceof Date) || isNaN(parsedDateTime.getTime())) {
+  if (!dateTime || !(parsedDateTime instanceof Date) || isNaN(parsedDateTime.getTime() || parsedDateTime <= new Date())) {
     return res.status(400).json({ message: 'Invalid meal date and time: Must be a valid future date and time' });
   }
 

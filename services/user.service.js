@@ -18,6 +18,9 @@ const userService = {
   },
   getProfile: (userId, callback) => {
     userDao.getById(userId, callback);
+  },
+  getAllFiltered: (filters, callback) => {
+    userDao.getAllFiltered(filters, callback);
   }
 };
 
