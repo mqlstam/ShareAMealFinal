@@ -20,28 +20,28 @@ const validateRequest = (req, res, next) => {
 
 router.get("/users/profile", authenticate, userController.getProfile);
 router.post(
-  "/users",
+  "/user",
   createUserValidationRules(),
   validateRequest,
   userController.create
 );
-router.get("/users", authenticate, userController.getAll);
+router.get("/user", authenticate, userController.getAll);
 router.get(
-  "/users/:userId",
+  "/user/:userId",
   authenticate,
   getUserValidationRules(),
   validateRequest,
   userController.getById
 );
 router.put(
-  "/users/:userId",
+  "/user/:userId",
   authenticate,
   updateUserValidationRules(),
   validateRequest,
   userController.update
 );
 router.delete(
-  "/users/:userId",
+  "/user/:userId",
   authenticate,
   getUserValidationRules(),
   validateRequest,
