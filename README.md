@@ -29,11 +29,3 @@ Share-a-Meal is een applicatie waarmee gebruikers maaltijden kunnen aanbieden en
 ## Testen
 
 Deze applicatie heeft een reeks unit- en integratietests. Je kunt deze tests uitvoeren met het commando `npm test`.
-
-## Documentatie
-
-Uitgebreide documentatie over de API-eindpunten en de algemene architectuur van de applicatie is te vinden in het bijgevoegde `ShareAMealFunctionalDesign.pdf` document.
-
-## Bijdragen
-
-Bijdragen aan dit project zijn welkom. Als je verbeteringen wilt aanbrengen, open dan een pull request met een duidelijke beschrijving van de wijzigingen.
