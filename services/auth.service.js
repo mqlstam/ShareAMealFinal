@@ -1,8 +1,8 @@
 
 
 import jwt from 'jsonwebtoken';
-import userDao from '../dao/user.dao';
-import config from '../util/config';
+import userDao from '../dao/user.dao.js';
+import config from '../util/config.js';
 
 const authService = {
   login: (emailAddress, password, callback) => {

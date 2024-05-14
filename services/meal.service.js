@@ -1,5 +1,5 @@
 
-import mealDao from '../dao/meal.dao';
+import mealDao from '../dao/meal.dao.js';
 
 const mealService = {
   create: (meal, callback) => {

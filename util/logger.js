@@ -1,7 +1,7 @@
-
 import tracer from 'tracer';
-
 import dotenv from 'dotenv';
+
+dotenv.config();
 
 const logger = tracer.colorConsole({
   format: '{{timestamp}} <{{title}}> {{file}}:{{line}} : {{message}}',
@@ -12,4 +12,4 @@ const logger = tracer.colorConsole({
   }
 });
 
-export default logger;
+export default logger

@@ -1,7 +1,7 @@
 
-import logger from '../util/logger';
-import authService from '../services/auth.service';
-import responseFormatter from '../middleware/responseFormatter';
+import logger from '../util/logger.js';
+import authService from '../services/auth.service.js';
+import responseFormatter from '../middleware/responseFormatter.js';
 
 const authController = {
   login: (req, res, next) => {

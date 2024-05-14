@@ -1,5 +1,5 @@
 
-import userDao from '../dao/user.dao';
+import userDao from '../dao/user.dao.js';
 
 const userService = {
   create: (user, callback) => {

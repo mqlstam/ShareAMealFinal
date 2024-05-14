@@ -1,5 +1,5 @@
 // controllers/info.controller.js
-import logger from '../util/logger';
+import logger from '../util/logger.js';
 const infoController = {
   getInfo: (req, res) => {
     const systemInfo = {

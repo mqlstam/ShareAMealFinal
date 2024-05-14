@@ -1,5 +1,5 @@
-import logger from '../util/logger';
-import userService from '../services/user.service';
+import logger from '../util/logger.js';
+import userService from '../services/user.service.js';
 
 const userController = {
   create: (req, res, next) => {

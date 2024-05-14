@@ -1,8 +1,8 @@
 // controllers/meal.controller.js
 
 
-import logger from '../util/logger';
-import mealService from '../services/meal.service';
+import logger from '../util/logger.js';
+import mealService from '../services/meal.service.js';
 
 const mealController = {
   create: (req, res, next) => {

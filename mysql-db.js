@@ -2,7 +2,7 @@
 
 import dotenv from 'dotenv';
 import mysql from 'mysql2';
-import logger from './util/logger';
+import logger from './util/logger.js';
 
 const dbConfig = {
   host: process.env.DB_HOST,
