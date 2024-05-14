@@ -1,4 +1,3 @@
-
 import logger from '../util/logger.js';
 import authService from '../services/auth.service.js';
 import responseFormatter from '../middleware/responseFormatter.js';
@@ -20,7 +19,13 @@ const authController = {
       if (error) {
         // Log the error
         logger.error(`Error during login: ${error.message}`);
-        return next(error);
+        
+        // Check the type of error and send appropriate status code
+        if (error.message === 'Invalid email or password') {
+          return res.status(400).json({ message: error.message });
+        }
+
+        return res.status(500).json({ message: 'Internal server error' });
       }
 
       // Log the successful login
