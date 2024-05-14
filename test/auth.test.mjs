@@ -10,7 +10,7 @@ describe('Authentication', () => {
   describe('POST /api/login', () => {
     it('should return a token when valid credentials are provided', (done) => {
       const validCredentials = {
-        emailAddress: 'j.doe@server.com',
+        emailAddress: 'h.tank@server.com',
         password: 'secret',
       };
 
