@@ -1,0 +1,2488 @@
+.env.example
+# .env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=share-a-meal-user
+DB_PASSWORD=secret
+DB_DATABASE=share-a-meal
+SECRET_KEY=your-secret-key
+LOG_LEVEL=debug
+
+README.md
+# Share-a-Meal Applicatie
+Dit is de backend applicatie voor het Share-a-Meal project, ontwikkeld als
+onderdeel van de module Programmeren 4 aan de Avans Hogeschool.
+## Beschrijving
+Share-a-Meal is een applicatie waarmee gebruikers maaltijden kunnen aanbieden
+en andere gebruikers zich kunnen aanmelden om aan die maaltijden deel te
+nemen. Deze repository bevat de backend API voor de applicatie, gebouwd met
+Node.js en Express.
+## Functies
+- **Authenticatie**: Gebruikers kunnen zich registreren en inloggen om
+toegang te krijgen tot de beveiligde functionaliteiten van de applicatie.
+- **Gebruikersbeheer**: Nieuwe gebruikers kunnen worden geregistreerd, en
+bestaande gebruikers kunnen hun profielgegevens bekijken, bijwerken en
+verwijderen.
+- **Maaltijdbeheer**: Gebruikers kunnen nieuwe maaltijden toevoegen,
+bestaande maaltijden bijwerken en verwijderen, en een overzicht van alle
+beschikbare maaltijden bekijken.
+- **Deelname beheren**: Gebruikers kunnen zich aanmelden voor een maaltijd,
+hun deelname annuleren, en de deelnemerslijst en details van deelnemers
+bekijken (alleen voor de eigenaar van de maaltijd).
+## Vereisten
+- Node.js (versie 14 of hoger)
+- MySQL database
+## Installatie
+1. Kloon deze repository naar je lokale machine.
+2. Navigeer naar de projectmap in je terminal.
+3. Kopieer het `.env.example` bestand naar `.env` en vul de benodigde
+configuratiegegevens in (zoals database-instellingen en geheime sleutels).
+4. Installeer de vereiste afhankelijkheden met het commando `npm install`.
+5. Start de applicatie met het commando `npm start`.
+## Testen
+
+Deze applicatie heeft een reeks unit- en integratietests. Je kunt deze tests
+uitvoeren met het commando `npm test`.
+
+controllers/auth.controller.js
+// controllers/auth.controller.js
+const logger = require('../util/logger');
+const authService = require('../services/auth.service');
+const responseFormatter = require('../middleware/responseFormatter');
+const authController = {
+  login: (req, res, next) => {
+    const { emailAddress, password } = req.body;
+    // Log the incoming request data
+    // Validate the input data
+    if (!emailAddress || !password) {
+      logger.warn('Invalid login request: Missing email or password');
+      return res.status(400).json({ message: 'Email and password are
+required' });
+}
+    authService.login(emailAddress, password, (error, data) => {
+if (error) {
+        // Log the error
+        logger.error(`Error during login: ${error.message}`);
+        return next(error);
+}
+      // Log the successful login
+       (`User ${emailAddress} logged in successfully`);
+      // Format the response using responseFormatter
+      res.status(200).json({ message: 'Login successful', data });
+});
+}
+};
+module.exports = authController;
+
+controllers/info.controller.js
+// controllers/info.controller.js
+const logger = require('../util/logger');
+const infoController = {
+  getInfo: (req, res) => {
+    const systemInfo = {
+      studentName: 'Miquel Stam',
+      studentNumber: '2159021',
+      description: 'Share-a-Meal Application'
+};
+    // Log the successful operation
+     ('System info retrieved successfully');
+    // Format the response using responseFormatter
+    res.status(200).json({ message: 'Info retrieved successfully', data:
+systemInfo });
+}
+};
+module.exports = infoController;
+
+controllers/meal.controller.js
+// controllers/meal.controller.js
+const logger = require('../util/logger');
+const mealService = require('../services/meal.service');
+const mealController = {
+  create: (req, res, next) => {
+    const meal = req.body;
+     (`Creating new meal: ${meal.name}`);
+    mealService.create(meal, (error, data) => {
+if (error) {
+        logger.error(`Error creating meal: ${error.message}`);
+        return next(error);
+}
+       (`Meal created: ${ }`);
+      res.status(201).json({ message: 'Meal created successfully', data });
+});
+},
+  getAll: (req, res, next) => {
+     ('Retrieving all meals');
+    mealService.getAll((error, data) => {
+if (error) {
+        logger.error(`Error retrieving meals: ${error.message}`);
+        return next(error);
+}
+       ('Meals retrieved successfully');
+      res.status(200).json({ message: 'Meals retrieved successfully', data });
+});
+},
+  getById: (req, res, next) => {
+    const mealId = req.params.mealId;
+     (`Retrieving meal: ${mealId}`);
+    mealService.getById(mealId, (error, data) => {
+if (error) {
+        logger.error(`Error retrieving meal: ${error.message}`);
+        return next(error);
+}
+if (!data) {
+        logger.warn(`Meal not found: ${mealId}`);
+        return res.status(404).json({ message: 'Meal not found' });
+}
+       (`Meal retrieved: ${mealId}`);
+
+res.status(200).json({ message: 'Meal retrieved successfully', data });
+});
+},
+  update: (req, res, next) => {
+    const mealId = req.params.mealId;
+    const updatedMeal = req.body;
+    const authenticatedUserId = req.user.userId;
+    mealService.getCookId(mealId, (error, cookId) => {
+if (error) {
+        return next(error);
+}
+      if (cookId !== authenticatedUserId) {
+        return res.status(403).json({ message: 'You are not authorized to
+update this meal' });
+}
+       (`Updating meal: ${mealId}`);
+      mealService.update(mealId, updatedMeal, (error, data) => {
+if (error) {
+          logger.error(`Error updating meal: ${error.message}`);
+          return next(error);
+}
+if (!data) {
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ message: 'Meal not found' });
+}
+         (`Meal updated: ${mealId}`);
+        res.status(200).json({ message: 'Meal updated successfully', data });
+});
+});
+},
+  delete: (req, res, next) => {
+    const mealId = req.params.mealId;
+    const authenticatedUserId = req.user.userId;
+    mealService.getCookId(mealId, (error, cookId) => {
+if (error) {
+        return next(error);
+}
+      if (cookId !== authenticatedUserId) {
+        return res.status(403).json({ message: 'You are not authorized to
+delete this meal' });
+}
+       (`Deleting meal: ${mealId}`);
+      mealService.delete(mealId, (error, data) => {
+if (error) {
+
+`);
+const mealId = req.params.mealId;
+const userId = req.user.userId;
+ (`User ${userId} canceling participation in meal: ${mealId}`);
+mealService.cancelParticipation(userId, mealId, (error, data) => {
+if (error) {
+    logger.error(`Error canceling participation in meal: ${error.message}
+    return next(error);
+}
+   (`User ${userId} canceled participation in meal: ${mealId}`);
+  res.status(200).json({ message: 'Participation canceled successfully',
+logger.error(`Error deleting meal: ${error.message}`);
+        return next(error);
+}
+if (!data) {
+        logger.warn(`Meal not found: ${mealId}`);
+        return res.status(404).json({ message: 'Meal not found' });
+}
+       (`Meal deleted: ${mealId}`);
+      res.status(204).json({ message: 'Meal deleted successfully', data });
+});
+});
+},
+participate: (req, res, next) => {
+  const mealId = req.params.mealId;
+  const userId = req.user.userId;
+   (`User ${userId} participating in meal: ${mealId}`);
+  mealService.participate(userId, mealId, (error, data) => {
+if (error) {
+      logger.error(`Error participating in meal: ${error.message}`);
+      return next(error);
+}
+     (`User ${userId} participated in meal: ${mealId}`);
+    res.status(200).json({ message: 'Participation successful', data });
+});
+},
+cancelParticipation: (req, res, next) => {
+data });
+});
+},
+  getParticipants: (req, res, next) => {
+    const mealId = req.params.mealId;
+     (`Retrieving participants for meal: ${mealId}`);
+    mealService.getParticipants(mealId, (error, data) => {
+
+if (error) {
+logger.error(`Error retrieving participants: ${error.message}`);
+return next(error);
+}
+       (`Participants retrieved for meal: ${mealId}`);
+      res.status(200).json({ message: 'Participants retrieved successfully',
+data });
+});
+},
+  getParticipantDetails: (req, res, next) => {
+    const mealId = req.params.mealId;
+    const participantId = req.params.participantId;
+     (`Retrieving participant details for meal: ${mealId},
+participant: ${participantId}`);
+{
+`);
+mealService.getParticipantDetails(mealId, participantId, (error, data) =>
+if (error) {
+    logger.error(`Error retrieving participant details: ${error.message}
+    return next(error);
+}
+if (!data) {
+    logger.warn(`Participant not found: ${participantId}`);
+    return res.status(404).json({ message: 'Participant not found' });
+}
+   (`Participant details retrieved for meal: ${mealId},
+participant: ${participantId}`);
+      res.status(200).json({ message: 'Participant details retrieved
+successfully', data });
+});
+}
+};
+module.exports = mealController;
+
+controllers/user.controller.js
+const logger = require('../util/logger');
+const userService = require('../services/user.service');
+const userController = {
+  create: (req, res, next) => {
+    const user = req.body;
+     ('Creating new user', user);
+    userService.create(user, (error, data) => {
+if (error) {
+        logger.error(`Error creating user: ${error.message}`);
+        return next(error);
+}
+       (`User created: ${ }`);
+      res.status(201).json({ message: 'User created successfully', data });
+});
+},
+  getAll: (req, res, next) => {
+    const filters = {
+      firstName: req.query.firstName,
+      lastName: req.query.lastName,
+      emailAddress: req.query.emailAddress,
+      roles: req.query.roles
+};
+     ('Retrieving users with filters', filters);
+    userService.getAllFiltered(filters, (error, data) => {
+if (error) {
+        logger.error(`Error retrieving users: ${error.message}`);
+        return next(error);
+}
+       ('Users retrieved successfully');
+      res.status(200).json({ message: 'Users retrieved successfully', data });
+});
+},
+  getById: (req, res, next) => {
+    const userId = req.params.userId;
+     (`Retrieving user: ${userId}`);
+    userService.getById(userId, (error, data) => {
+if (error) {
+        logger.error(`Error retrieving user: ${error.message}`);
+        return next(error);
+
+}
+if (!data) {
+        logger.warn(`User not found: ${userId}`);
+        return res.status(404).json({ message: 'User not found' });
+}
+       (`User retrieved: ${userId}`);
+      res.status(200).json({ message: 'User retrieved successfully', data });
+});
+},
+  update: (req, res, next) => {
+    const userId = req.params.userId;
+    const updatedUser = req.body;
+    const authenticatedUserId = req.user.userId;
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ message: 'You are not authorized to
+update this user' });
+}
+     (`Updating user: ${userId}`);
+    userService.update(userId, updatedUser, (error, data) => {
+if (error) {
+        logger.error(`Error updating user: ${error.message}`);
+        return next(error);
+}
+if (!data) {
+        logger.warn(`User not found: ${userId}`);
+        return res.status(404).json({ message: 'User not found' });
+}
+       (`User updated: ${userId}`);
+      res.status(200).json({ message: 'User updated successfully', data });
+});
+},
+  delete: (req, res, next) => {
+    const userId = req.params.userId;
+    const authenticatedUserId = req.user.userId;
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ message: 'You are not authorized to
+delete this user' });
+}
+     (`Deleting user: ${userId}`);
+    userService.delete(userId, (error, data) => {
+if (error) {
+        logger.error(`Error deleting user: ${error.message}`);
+
+return next(error);
+}
+if (!data) {
+        logger.warn(`User not found: ${userId}`);
+        return res.status(404).json({ message: 'User not found' });
+}
+       (`User deleted: ${userId}`);
+      res.status(204).json({ message: 'User deleted successfully', data });
+});
+},
+  getProfile: (req, res, next) => {
+    const userId = req.user.userId;
+    if (typeof userId !== 'number') {
+      return res.status(400).json({ message: 'Invalid user ID' });
+}
+     (`Retrieving user profile: ${userId}`);
+    userService.getProfile(userId, (error, data) => {
+if (error) {
+        logger.error(`Error retrieving user: ${JSON.stringify(error)}`);
+        return next(error);
+}
+if (!data) {
+        logger.warn(`User not found: ${userId}`);
+        return res.status(404).json({ message: 'User not found' });
+}
+       (`User profile retrieved: ${userId}`);
+      res.status(200).json({ message: 'User profile retrieved successfully',
+data });
+});
+}
+};
+module.exports = userController;
+
+dao/meal.dao.js
+const db = require('../mysql-db');
+const mealDao = {
+  create: (meal, callback) => {
+    const query = 'INSERT INTO meal (name, description, imageUrl, price,
+dateTime, maxAmountOfParticipants, isActive, isVega, isVegan, isToTakeHome,
+cookId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [
+meal.name,
+      meal.description,
+      meal.imageUrl,
+meal.price,
+      meal.dateTime,
+      meal.maxAmountOfParticipants,
+      meal.isActive,
+      meal.isVega,
+      meal.isVegan,
+      meal.isToTakeHome,
+meal.cookId
+];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, { id: result.insertId, ...meal });
+});
+},
+  getAll: (callback) => {
+    const query = 'SELECT * FROM meal';
+    db.query(query, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, result);
+});
+},
+  getById: (id, callback) => {
+    const query = 'SELECT * FROM meal WHERE id = ?';
+    db.query(query, [id], (error, result) => {
+if (error) {
+        return callback(error, null);
+
+}
+      if (result.length === 0) {
+        return callback({ message: 'Meal not found' }, null);
+}
+      callback(null, result[0]);
+});
+},
+  update: function(id, meal, callback) {
+    const query = 'UPDATE meal SET ? WHERE id = ?';
+    const values = [meal, id];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.affectedRows === 0) {
+        return callback({ message: 'Meal not found' }, null);
+}
+      callback(null, { id, ...meal });
+});
+},
+  delete: (id, callback) => {
+    const query = 'DELETE FROM meal WHERE id = ?';
+    db.query(query, [id], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.affectedRows === 0) {
+        return callback({ message: 'Meal not found' }, null);
+}
+      callback(null, { message: 'Meal deleted successfully' });
+});
+},
+  participate: (userId, mealId, callback) => {
+    const query = 'INSERT INTO meal_participant (userId, mealId) VALUES
+(?, ?)';
+    const values = [userId, mealId];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, { message: `User ${userId} has joined meal ${mealId}` });
+});
+
+},
+  cancelParticipation: (userId, mealId, callback) => {
+    const query = 'DELETE FROM meal_participant WHERE userId = ? AND mealId
+= ?';
+    const values = [userId, mealId];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.affectedRows === 0) {
+        return callback({ message: 'User is not a participant of this
+meal' }, null);
+}
+      callback(null, { message: `User ${userId} has cancelled participation
+for meal ${mealId}` });
+});
+},
+  getParticipants: (mealId, callback) => {
+    const query = `
+      SELECT u.id, u.firstName, u.lastName, u.emailAdress
+      FROM meal_participant mp
+      JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ?
+`;
+    db.query(query, [mealId], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, result);
+});
+},
+  getParticipantDetails: (mealId, participantId, callback) => {
+    const query = `
+      SELECT u.id, u.firstName, u.lastName, u.emailAdress, u.phoneNumber,
+u.street, u.city
+      FROM meal_participant mp
+      JOIN user u ON mp.userId = u.id
+      WHERE mp.mealId = ? AND u.id = ?
+`;
+
+    db.query(query, [mealId, participantId], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.length === 0) {
+        return callback({ message: 'Participant not found' }, null);
+}
+      callback(null, result[0]);
+});
+},
+  getCookId: (mealId, callback) => {
+    const query = 'SELECT cookId FROM meal WHERE id = ?';
+    db.query(query, [mealId], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.length === 0) {
+        return callback({ message: 'Meal not found' }, null);
+}
+      callback(null, result[0].cookId);
+});
+},
+};
+module.exports = mealDao;
+
+dao/user.dao.js
+const db = require('../mysql-db');
+const userDao = {
+  create: (user, callback) => {
+    const query = 'INSERT INTO user (firstName, lastName, emailAdress,
+password, phoneNumber, roles, street, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [
+      user.firstName,
+      user.lastName,
+      user.emailAddress,
+      user.password,
+      user.phoneNumber,
+user.roles,
+      user.street,
+user.city
+];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, { id: result.insertId, ...user });
+});
+},
+  getAll: (callback) => {
+    const query = 'SELECT * FROM user';
+    db.query(query, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, result);
+});
+},
+  getById: (id, callback) => {
+    console.log('id', id);
+    const query = 'SELECT * FROM user WHERE id = ?';
+    db.query(query, [id], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.length === 0) {
+        return callback({ message: 'User not found' }, null);
+
+}
+      callback(null, result[0]);
+});
+},
+  update: (id, user, callback) => {
+    const query = 'UPDATE user SET firstName = ?, lastName = ?, emailAdress
+= ?, password = ?, phoneNumber = ?, roles = ?, street = ?, city = ? WHERE id
+= ?';
+    const values = [
+      user.firstName,
+      user.lastName,
+      user.emailAddress,
+      user.password,
+      user.phoneNumber,
+user.roles,
+      user.street,
+user.city,
+id
+];
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.affectedRows === 0) {
+        return callback({ message: 'User not found' }, null);
+}
+      callback(null, { id, ...user });
+});
+},
+  delete: (id, callback) => {
+    const query = 'DELETE FROM user WHERE id = ?';
+    db.query(query, [id], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.affectedRows === 0) {
+        return callback({ message: 'User not found' }, null);
+}
+      callback(null, { message: 'User deleted successfully' });
+});
+},
+  getByEmail: (emailAddress, callback) => {
+    const query = 'SELECT * FROM user WHERE emailAdress = ?';
+
+db.query(query, [emailAddress], (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      if (result.length === 0) {
+        return callback(null, null);
+}
+      callback(null, result[0]);
+});
+},
+  getAllFiltered: (filters, callback) => {
+    let query = 'SELECT * FROM user';
+    const values = [];
+    if (filters.firstName) {
+      query += ' WHERE firstName LIKE ?';
+      values.push(`%${filters.firstName}%`);
+}
+    if (filters.lastName) {
+      query += (values.length > 0 ? ' AND lastName LIKE ?' : ' WHERE lastName
+LIKE ?');
+      values.push(`%${filters.lastName}%`);
+}
+    if (filters.emailAddress) {
+      query += (values.length > 0 ? ' AND emailAddress LIKE ?' : ' WHERE
+emailAddress LIKE ?');
+      values.push(`%${filters.emailAddress}%`);
+}
+    if (filters.roles) {
+      query += (values.length > 0 ? ' AND roles = ?' : ' WHERE roles = ?');
+      values.push(filters.roles);
+}
+    db.query(query, values, (error, result) => {
+if (error) {
+        return callback(error, null);
+}
+      callback(null, result);
+});
+}
+
+};
+module.exports = userDao;
+
+index.js
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const mealRoutes = require('./routes/meal.routes');
+const infoRoutes = require('./routes/info.routes');
+const responseFormatter = require('./middleware/responseFormatter');
+const errorMiddleware = require('./middleware/error');
+app.use(express.json());
+app.use(responseFormatter);
+app.use('/api', authRoutes);
+app.use('/api', userRoutes);
+app.use('/api', mealRoutes);
+app.use('/api', infoRoutes);
+app.get('/', (req, res) => {
+  res.send('Share-a-Meal API is running!');
+});
+app.use(errorMiddleware); // Use errorMiddleware after route handlers
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+middleware/auth.js
+// middleware/auth.js
+const jwt = require('jsonwebtoken');
+const config = require('../util/config');
+const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+}
+  jwt.verify(token, config.secretKey, (err, decoded) => {
+if (err) {
+      console.log(err);
+      return res.status(403).json({ message: 'Failed to authenticate
+token' });
+}
+    req.user = decoded;
+next();
+});
+};
+module.exports = authenticate;
+
+middleware/error.js
+// middleware/error.js
+const logger = require('../util/logger');
+const errorMiddleware = (err, req, res, next) => {
+  logger.error(err.stack); // Log the error stack trace
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+  res.status(statusCode).json({
+    status: statusCode,
+    message: message,
+data: {}
+});
+};
+module.exports = errorMiddleware;
+
+middleware/responseFormatter.js
+const responseFormatter = (req, res, next) => {
+  // Save the original res.json method
+  const originalJson = res.json;
+  // Override res.json method
+  res.json = (data) => {
+    // Create a formatted response object
+    const formattedResponse = {
+      status: res.statusCode,
+      message: null,
+data: null,
+};
+    // If the data is an instance of Error, handle it differently
+    if (data instanceof Error) {
+      formattedResponse.message = data.message;
+    } else if (typeof data === 'object' && data !== null) {
+      // Check if data already has a message and data property
+      if (data.message && data.data) {
+        formattedResponse.message = data.message;
+        formattedResponse.data = data.data;
+      } else if (data.message) {
+        // If data has a message property, use it as the message
+        formattedResponse.message = data.message;
+} else {
+        // Assume the data object itself is the response data
+        formattedResponse.data = data;
+}
+    } else if (typeof data === 'string') {
+      // If data is a string, treat it as a message
+      formattedResponse.message = data;
+}
+    // Call the original res.json method with the formatted response
+    originalJson.call(res, formattedResponse);
+};
+next();
+};
+module.exports = responseFormatter;
+
+middleware/validate.js
+const validateUser = (req, res, next) => {
+  const { firstName, lastName, emailAddress, password } = req.body;
+  // Ensure request data is provided
+  if (!req.body) {
+    return res.status(400).json({ message: 'Request body is missing' });
+}
+  // Validate firstName
+  if (!firstName || typeof firstName !== 'string' || firstName.trim().length
+< 2 || firstName.trim().length > 50) {
+    return res.status(400).json({ message: 'Invalid first name: Must be a
+string between 2 and 50 characters' });
+}
+  // Validate lastName
+  if (!lastName || typeof lastName !== 'string' || lastName.trim().length < 2
+|| lastName.trim().length > 50) {
+    return res.status(400).json({ message: 'Invalid last name: Must be a
+string between 2 and 50 characters' });
+}
+  // Validate emailAddress
+  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  if (!emailAddress || typeof emailAddress !== 'string' || !
+emailRegex.test(emailAddress)) {
+    return res.status(400).json({ message: 'Invalid email address: Must
+follow the correct email format' });
+}
+  // Validate password
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-
+z\d!@#$%^&*]{8,}$/;
+  if (!password || typeof password !== 'string' || !
+passwordRegex.test(password)) {
+    return res.status(400).json({
+message:
+        'Invalid password: Must be at least 8 characters, include at least
+one uppercase letter, one lowercase letter, one number, and one special
+character (!@#$%^&*)',
+});
+}
+
+  // Pass control to the next middleware function
+next();
+};
+const validateMeal = (req, res, next) => {
+  const { name, description, price, dateTime, maxAmountOfParticipants,
+imageUrl } = req.body;
+  // Ensure request data is provided
+  if (!req.body) {
+    return res.status(400).json({ message: 'Request body is missing' });
+}
+  // Validate name
+  if (!name || typeof name !== 'string' || name.trim().length < 2 ||
+name.trim().length > 100) {
+    return res.status(400).json({ message: 'Invalid meal name: Must be a
+string between 2 and 100 characters' });
+}
+  // Validate description
+  if (!description || typeof description !== 'string' ||
+description.trim().length < 10 || description.trim().length > 500) {
+    return res.status(400).json({ message: 'Invalid meal description: Must be
+a string between 10 and 500 characters' });
+}
+  // Validate price
+  if (price === undefined || typeof price !== 'number' || price <= 0 || price
+> 10000) {
+    return res.status(400).json({ message: 'Invalid meal price: Must be a
+positive number not exceeding 10,000' });
+}
+  // Validate dateTime
+  const parsedDateTime = new Date(dateTime);
+  if (!dateTime || !(parsedDateTime instanceof Date) ||
+isNaN(parsedDateTime.getTime() || parsedDateTime <= new Date())) {
+    return res.status(400).json({ message: 'Invalid meal date and time: Must
+be a valid future date and time' });
+}
+  // Validate maxAmountOfParticipants
+  if (maxAmountOfParticipants === undefined || typeof
+
+maxAmountOfParticipants !== 'number' || maxAmountOfParticipants < 1 ||
+maxAmountOfParticipants > 1000) {
+    return res.status(400).json({ message: 'Invalid maximum number of
+participants: Must be a positive number between 1 and 1000' });
+}
+  // Validate imageUrl
+  const imageUrlRegex = /^ s?:\/\/.*\/(.+)\.(jpg|jpeg|png|gif|bmp)$/;
+  if (!imageUrl || typeof imageUrl !== 'string' || !
+imageUrlRegex.test(imageUrl)) {
+    return res.status(400).json({ message: 'Invalid meal image URL: Must be a
+valid image URL ending with jpg, jpeg, png, gif, or bmp' });
+}
+next();
+};
+module.exports = { validateUser, validateMeal };
+
+mysql-db.js
+const mysql = require('mysql2');
+const logger = require('./util/logger'); // We'll create this logger utility
+later
+require('dotenv').config();
+const dbConfig = {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  connectionLimit: 10,
+  waitForConnections: true,
+  queueLimit: 0,
+  multipleStatements: true
+};
+const pool = mysql.createPool(dbConfig);
+pool.on('connection', function (connection) {
+  logger.trace(`Connected to database '${connection.config.database}' on
+'${connection.config.host}:${connection.config.port}'`);
+});
+module.exports = pool;
+
+package.json
+{
+}
+}
+"name": "shareamealfinal",
+"version": "1.0.0",
+"description": "",
+"main": "index.js",
+"scripts": {
+  "start": "node index.js",
+  "dev": "nodemon index.js"
+  "test": "mocha 'test/**/*.js' --exit"
+},
+"keywords": [],
+"author": "",
+"license": "ISC",
+"dependencies": {
+  "dotenv": "^16.4.5",
+  "express": "^4.19.2",
+  "express-validator": "^7.0.1",
+  "jsonwebtoken": "^9.0.2",
+  "mysql2": "^3.9.7",
+  "tracer": "^1.3.0"
+},
+"devDependencies": {
+  "chai": "^5.1.0",
+  "chai- ": "^4.4.0",
+  "mocha": "^10.4.0",
+  "nodemon": "^3.1.0"
+
+routes/auth.routes.js
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/auth.controller');
+router.post('/login', authController.login);
+module.exports = router;
+
+routes/info.routes.js
+// routes/info.routes.js
+const express = require('express');
+const router = express.Router();
+const infoController = require('../controllers/info.controller');
+router.get('/info', infoController.getInfo);
+module.exports = router;
+
+routes/meal.routes.js
+const express = require('express');
+const router = express.Router();
+const mealController = require('../controllers/meal.controller');
+const authenticate = require('../middleware/auth');
+const { validationResult } = require('express-validator');
+const {
+  createMealValidationRules,
+  updateMealValidationRules,
+  getMealValidationRules,
+} = require('../validators/meal.validator');
+// Custom middleware to handle validation errors
+const validateRequest = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+}
+next();
+};
+router.post(
+'/meals',
+  authenticate,
+  createMealValidationRules(),
+  validateRequest,
+  mealController.create
+);
+router.get('/meals', mealController.getAll);
+router.get(
+  '/meals/:mealId',
+  getMealValidationRules(),
+  validateRequest,
+  mealController.getById
+);
+router.put(
+  '/meals/:mealId',
+  authenticate,
+  updateMealValidationRules(),
+  validateRequest,
+  mealController.update
+);
+router.delete('/meals/:mealId', authenticate, mealController.delete);
+
+router.post('/meals/:mealId/participate', authenticate,
+mealController.participate);
+router.delete('/meals/:mealId/participate', authenticate,
+mealController.cancelParticipation);
+router.get('/meals/:mealId/participants', authenticate,
+mealController.getParticipants);
+router.get(
+  '/meals/:mealId/participants/:participantId',
+  authenticate,
+  mealController.getParticipantDetails
+);
+module.exports = router;
+
+routes/user.routes.js
+const express = require("express");
+const router = express.Router();
+const userController = require("../controllers/user.controller");
+const authenticate = require("../middleware/auth");
+const { validationResult } = require("express-validator");
+const {
+  createUserValidationRules,
+  updateUserValidationRules,
+  getUserValidationRules,
+} = require("../validators/user.validator");
+// Custom middleware to handle validation errors
+const validateRequest = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+}
+next();
+};
+router.get("/user/profile", authenticate, userController.getProfile);
+router.post(
+"/user",
+  createUserValidationRules(),
+  validateRequest,
+  userController.create
+);
+router.get("/user", authenticate, userController.getAll);
+router.get(
+  "/user/:userId",
+  authenticate,
+  getUserValidationRules(),
+  validateRequest,
+  userController.getById
+);
+router.put(
+  "/user/:userId",
+  authenticate,
+  updateUserValidationRules(),
+  validateRequest,
+  userController.update
+);
+
+router.delete(
+  "/user/:userId",
+  authenticate,
+  getUserValidationRules(),
+  validateRequest,
+  userController.delete
+);
+module.exports = router;
+
+services/auth.service.js
+const jwt = require('jsonwebtoken');
+const userDao = require('../dao/user.dao');
+const config = require('../util/config');
+const authService = {
+  login: (emailAddress, password, callback) => {
+    userDao.getByEmail(emailAddress, (error, user) => {
+if (error) {
+        return callback(error, null);
+}
+      if (!user || user.password !== password) {
+        return callback({ message: 'Invalid email or password' }, null);
+}
+      const token = jwt.sign({ userId:  }, config.secretKey,
+{ expiresIn: '1h' });
+      callback(null, { token });
+});
+}
+};
+module.exports = authService;
+
+services/meal.service.js
+const mealDao = require('../dao/meal.dao');
+const mealService = {
+  create: (meal, callback) => {
+try {
+      mealDao.create(meal, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  getAll: (callback) => {
+try {
+      mealDao.getAll(callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  getById: (id, callback) => {
+try {
+      mealDao.getById(id, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  update: (id, updatedMeal, callback) => {
+try {
+      mealDao.update(id, updatedMeal, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  delete: (id, callback) => {
+try {
+      mealDao.delete(id, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+
+  participate: (userId, mealId, callback) => {
+try {
+      mealDao.getById(mealId, (error, meal) => {
+if (error) {
+          return callback(error, null);
+}
+if (!meal) {
+          return callback({ message: 'Meal not found' }, null);
+}
+        if (meal.participants && meal.participants.length >=
+meal.maxAmountOfParticipants) {
+          return callback({ message: 'Maximum number of participants
+reached' }, null);
+}
+        mealDao.participate(userId, mealId, callback);
+});
+    } catch (error) {
+      callback(error, null);
+}
+},
+  cancelParticipation: (userId, mealId, callback) => {
+try {
+      mealDao.getParticipants(mealId, (error, participants) => {
+if (error) {
+          return callback(error, null);
+}
+        const isParticipant = participants.some(p => p.id === userId);
+        if (!isParticipant) {
+          return callback({ message: 'User is not a participant of this
+meal' }, null);
+}
+        mealDao.cancelParticipation(userId, mealId, callback);
+});
+    } catch (error) {
+      callback(error, null);
+}
+},
+
+getParticipants: (mealId, callback) => {
+try {
+      mealDao.getParticipants(mealId, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  getParticipantDetails: (mealId, participantId, callback) => {
+try {
+      mealDao.getParticipantDetails(mealId, participantId, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+  getCookId: (mealId, callback) => {
+try {
+      mealDao.getCookId(mealId, callback);
+    } catch (error) {
+      callback(error, null);
+}
+},
+};
+module.exports = mealService;
+
+services/user.service.js
+const userDao = require('../dao/user.dao');
+const userService = {
+  create: (user, callback) => {
+    userDao.create(user, callback);
+},
+  getAll: (callback) => {
+    userDao.getAll(callback);
+},
+  getById: (id, callback) => {
+    userDao.getById(id, callback);
+},
+  update: (id, updatedUser, callback) => {
+    userDao.update(id, updatedUser, callback);
+},
+  delete: (id, callback) => {
+    userDao.delete(id, callback);
+},
+  getProfile: (userId, callback) => {
+    userDao.getById(userId, callback);
+},
+  getAllFiltered: (filters, callback) => {
+    userDao.getAllFiltered(filters, callback);
+}
+};
+module.exports = userService;
+
+test/api.test.js
+const chai = require('chai');
+const chai  = require('chai- ');
+const server = require('../index');
+chai.should();
+chai.use(chai );
+describe('Share-a-Meal API', () => {
+  describe('GET /', () => {
+    it('should return the welcome message', (done) => {
+      chai.request(server)
+});
+});
+.get('/')
+.end((err, res) => {
+  res.should.have.status(200);
+  res.text.should.equal('Share-a-Meal API is running!');
+done();
+});
+  // Add more test cases for API endpoints
+});
+
+test/meal.service.test.js
+const chai = require('chai');
+const expect = chai.expect;
+const mealService = require('../services/meal.service');
+describe('Meal Service', () => {
+  describe('participate', () => {
+    it('should add a user as a participant', (done) => {
+      const userId = 1;
+      const mealId = 1;
+      mealService.participate(userId, mealId, (error, data) => {
+        expect(error).to.be.null;
+        expect(data).to.be.an('object');
+        expect(data.message).to.contain(`User ${userId} has joined meal
+${mealId}`);
+done();
+});
+});
+    it('should return an error if the meal does not exist', (done) => {
+      const userId = 1;
+      const mealId = 999; // Assuming meal ID 999 does not exist
+      mealService.participate(userId, mealId, (error, data) => {
+        expect(error).to.be.an('object');
+        expect(error.message).to.equal('Meal not found');
+        expect(data).to.be.null;
+done();
+});
+});
+    it('should return an error if the maximum number of participants is
+reached', (done) => {
+      // Assuming meal ID 2 has reached the maximum number of participants
+      const userId = 1;
+      const mealId = 2;
+      mealService.participate(userId, mealId, (error, data) => {
+        expect(error).to.be.an('object');
+        expect(error.message).to.equal('Maximum number of participants
+reached');
+        expect(data).to.be.null;
+
+meal');
+expect(error).to.be.an('object');
+expect(error.message).to.equal('User is not a participant of this
+expect(data).to.be.null;
+done();
+done();
+});
+});
+});
+  describe('cancelParticipation', () => {
+    it('should cancel a user\'s participation', (done) => {
+      const userId = 1;
+      const mealId = 1;
+      mealService.cancelParticipation(userId, mealId, (error, data) => {
+        expect(error).to.be.null;
+        expect(data).to.be.an('object');
+        expect(data.message).to.contain(`User ${userId} has cancelled
+participation for meal ${mealId}`);
+done();
+});
+});
+    it('should return an error if the user is not a participant', (done) => {
+      const userId = 999; // Assuming user ID 999 is not a participant
+      const mealId = 1;
+      mealService.cancelParticipation(userId, mealId, (error, data) => {
+});
+});
+});
+  // Add more test cases for getParticipants and getParticipantDetails
+});
+
+test/user.service.test.js
+const chai = require('chai');
+const expect = chai.expect;
+const userService = require('../services/user.service');
+describe('User Service', () => {
+  describe('create', () => {
+    it('should create a new user', (done) => {
+      const newUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        emailAddress: 'john.doe@example.com',
+        password: 'password123',
+        phoneNumber: '1234567890',
+        roles: 'guest',
+        street: '123 Main St',
+        city: 'Anytown'
+};
+      userService.create(newUser, (error, data) => {
+        expect(error).to.be.null;
+        expect(data).to.be.an('object');
+        expect(data).to.have.property('id');
+        expect(data.firstName).to.equal(newUser.firstName);
+        expect(data.lastName).to.equal(newUser.lastName);
+        expect(data.emailAddress).to.equal(newUser.emailAddress);
+done();
+});
+});
+});
+  describe('getAll', () => {
+    it('should return an array of users', (done) => {
+      userService.getAll((error, data) => {
+        expect(error).to.be.null;
+        expect(data).to.be.an('array');
+done();
+});
+});
+});
+  describe('getById', () => {
+    it('should return a user by ID', (done) => {
+
+const userId = 1; // Assuming user ID 1 exists
+    userService.getById(userId, (error, data) => {
+      expect(error).to.be.null;
+      expect(data).to.be.an('object');
+      expect(data).to.have.property('id', userId);
+done();
+});
+});
+  it('should return an error if the user does not exist', (done) => {
+    const userId = 999; // Assuming user ID 999 does not exist
+    userService.getById(userId, (error, data) => {
+      expect(error).to.be.an('object');
+      expect(error.message).to.equal('User not found');
+      expect(data).to.be.null;
+done();
+});
+});
+});
+describe('update', () => {
+  it('should update a user', (done) => {
+    const userId = 1; // Assuming user ID 1 exists
+    const updatedUser = {
+      firstName: 'Updated',
+      lastName: 'User',
+      emailAddress: 'updated@example.com',
+      password: 'newpassword',
+      phoneNumber: '0987654321',
+      roles: 'guest',
+      street: '456 Update St',
+      city: 'Updateville'
+};
+    userService.update(userId, updatedUser, (error, data) => {
+      expect(error).to.be.null;
+      expect(data).to.be.an('object');
+      expect( ).to.equal(userId);
+      expect(data.firstName).to.equal(updatedUser.firstName);
+      expect(data.lastName).to.equal(updatedUser.lastName);
+      expect(data.emailAddress).to.equal(updatedUser.emailAddress);
+done();
+
+});
+});
+    it('should return an error if the user does not exist', (done) => {
+      const userId = 999; // Assuming user ID 999 does not exist
+      const updatedUser = {
+        // ... (user data) ...
+};
+      userService.update(userId, updatedUser, (error, data) => {
+        expect(error).to.be.an('object');
+        expect(error.message).to.equal('User not found');
+        expect(data).to.be.null;
+done();
+});
+});
+});
+  describe('delete', () => {
+    it('should delete a user', (done) => {
+      const userId = 1; // Assuming user ID 1 exists
+      userService.delete(userId, (error, data) => {
+        expect(error).to.be.null;
+        expect(data).to.be.an('object');
+        expect(data.message).to.contain('User deleted successfully');
+done();
+});
+});
+    it('should return an error if the user does not exist', (done) => {
+      const userId = 999; // Assuming user ID 999 does not exist
+      userService.delete(userId, (error, data) => {
+        expect(error).to.be.an('object');
+        expect(error.message).to.equal('User not found');
+        expect(data).to.be.null;
+done();
+});
+});
+});
+});
+
+test.json
+{
+() {",
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has token\", function
+        "    var jsonData = pm.response.json();",
+"
+"info": {
+    "_postman_id": "d9a75cf1-ba8b-4758-8c26-d8cde9ad124d",
+    "name": "Share-a-Meal API",
+    "schema": " s schema.getpostman.com/json/collection/v2.1.0/
+collection.json"
+},
+"item": [
+{
+"name": "Authentication",
+"item": [
+{
+"name": "Login",
+"event": [
+{
+pm.expect(jsonData.data.token).to.be.a('string');",
+jsonData.data.token);"
+],
+],
+}
+"request": {
+}
+"});",
+"",
+"// Save the token for future requests",
+"var jsonData = pm.response.json();",
+"pm.environment.set(\"token\",
+"type": "text/javascript"
+"method": "POST",
+"header": [],
+
+\"john.doe@example.com\",\n
+"mode": "raw",
+"raw": "{\n    \"emailAddress\":
+   \"password\": \"Password123\"\n}",
+"options": {
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 201\", function
+        "    pm.response.to.have.status(201);",
+"});",
+"",
+        "pm.test(\"Response has user data\",
+        "    var jsonData = pm.response.json();",
+"
+function () {",
+},
+{
+]
+}
+{
+},
+"body": {
+},
+"response": []
+"name": "Users",
+"item": [
+}
+"url": {
+}
+"raw": {
+}
+"name": "Register User",
+"event": [
+{
+pm.expect(jsonData.data).to.have.property('id');",
+"language": "json"
+"raw": "{{base_url}}/api/login",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"login"
+
+pm.expect(jsonData.data).to.have.property('firstName');",
+"
+pm.expect(jsonData.data).to.have.property('lastName');",
+"
+pm.expect(jsonData.data).to.have.property('emailAddress');",
+],
+}
+}
+"request": {
+    "method": "POST",
+    "header": [],
+"body": {
+        "mode": "raw",
+"raw": "{\n
+\"firstName\": \"John\",\n
+],
+"
+"});"
+"type": "text/javascript"
+\"lastName\": \"Doe\",\n    \"emailAddress\": \"john.doe@example.com\",\n
+\"password\": \"Password123\",\n    \"phoneNumber\": \"0612345678\",\n
+\"roles\": \"guest\",\n
+\"street\": \"123 Main St\",\n
+"options": {
+\"city\":
+\"Anytown\"\n}",
+},
+{
+"response": []
+"name": "Get All Users",
+"event": [
+},
+},
+}
+}
+"url": {
+"raw": {
+}
+"language": "json"
+"raw": "{{base_url}}/api/users",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"users"
+
+() {",
+function () {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has user data\",
+        "    var jsonData = pm.response.json();",
+"
+pm.expect(jsonData.data).to.be.an('array');",
+},
+{
+"response": []
+"name": "Get User Profile",
+"event": [
+],
+{
+}
+"request": {
+},
+}
+],
+"method": "GET",
+"header": [],
+"url": {
+}
+{
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/users",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"users"
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+
+() {",
+function () {",
+"    pm.response.to.have.status(200);",
+"});",
+"",
+"pm.test(\"Response has user data\",
+"    var jsonData = pm.response.json();",
+"
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('firstName');",
+"
+pm.expect(jsonData.data).to.have.property('lastName');",
+"
+pm.expect(jsonData.data).to.have.property('emailAddress');",
+},
+],
+},
+}
+"request": {
+}
+],
+"method": "GET",
+"header": [
+],
+}
+"response": []
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/users/profile",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"users",
+"profile"
+
+() {",
+function () {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has user data\",
+        "    var jsonData = pm.response.json();",
+"
+{
+"name": "Get User by ID",
+"event": [
+],
+{
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('firstName');",
+"
+pm.expect(jsonData.data).to.have.property('lastName');",
+"
+pm.expect(jsonData.data).to.have.property('emailAddress');",
+}
+"request": {
+}
+],
+"method": "GET",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/users/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has updated user
+        "    var jsonData = pm.response.json();",
+"
+data\", function () {",
+},
+{
+"response": []
+"name": "Update User",
+"event": [
+},
+}
+{
+]
+"api",
+"users",
+"1"
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('firstName', 'Updated');",
+"
+pm.expect(jsonData.data).to.have.property('lastName', 'User');",
+"
+pm.expect(jsonData.data).to.have.property('emailAddress',
+'updated@example.com');",
+}
+"});"
+],
+"request": {
+}
+],
+"type": "text/javascript"
+"method": "PUT",
+"header": [
+{
+"key": "Authorization",
+"value": "Bearer {{token}}",
+
+\"roles\": \"guest\",\n
+\"street\": \"456 Update St\",\n
+"options": {
+\"city\":
+\"Updateville\"\n}",
+() {",
+"pm.test(\"Status code is 204\", function
+"    pm.response.to.have.status(204);",
+"});",
+"",
+"pm.test(\"Response has success
+message\", function () {",
+},
+{
+"response": []
+"name": "Delete User",
+"event": [
+},
+],
+},
+}
+"url": {
+}
+{
+"type": "text"
+}
+"body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"Updated\",\n
+\"lastName\": \"User\",\n    \"emailAddress\": \"updated@example.com\",\n
+\"password\": \"newpassword\",\n    \"phoneNumber\": \"0987654321\",\n
+"raw": {
+}
+"language": "json"
+"raw": "{{base_url}}/api/users/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"users",
+"1"
+"listen": "test",
+"script": {
+"exec": [
+
+"
+pm.expect(jsonData.message).to.contain('User deleted successfully');",
+},
+{
+]
+}
+],
+},
+"name": "Meals",
+"item": [
+{
+}
+"request": {
+}
+"response": []
+}
+],
+"method": "DELETE",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"    var jsonData = pm.response.json();",
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/users/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"name": "Create Meal",
+"event": [
+{
+"api",
+"users",
+"1"
+"listen": "test",
+"script": {
+"exec": [
+
+() {",
+function () {",
+"    pm.response.to.have.status(201);",
+"});",
+"",
+"pm.test(\"Response has meal data\",
+"    var jsonData = pm.response.json();",
+"
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('name');",
+"
+pm.expect(jsonData.data).to.have.property('description');",
+"
+pm.expect(jsonData.data).to.have.property('price');",
+"
+pm.expect(jsonData.data).to.have.property('dateTime');",
+"
+pm.expect(jsonData.data).to.have.property('maxAmountOfParticipants');",
+"
+pm.expect(jsonData.data).to.have.property('imageUrl');",
+],
+}
+"request": {
+}
+],
+"method": "POST",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"pm.test(\"Status code is 201\", function
+"});"
+"type": "text/javascript"
+"body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Delicious Meal\",\n
+\"description\": \"A tasty and healthy meal\",\n    \"imageUrl\": \" s 
+example.com/meal.jpg\",\n    \"price\": 10.99,\n    \"dateTime\":
+\"2023-06-01T18:00:00Z\",\n    \"maxAmountOfParticipants\": 5,\n
+\"isActive\": true,\n    \"isVega\": false,\n    \"isVegan\": true,\n
+
+\"isToTakeHome\": false,\n
+\"cookId\": 1\n}",
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has meal data\",
+        "    var jsonData = pm.response.json();",
+"
+function () {",
+},
+{
+"response": []
+"name": "Get All Meals",
+"event": [
+},
+pm.expect(jsonData.data).to.be.an('array');",
+],
+},
+{
+}
+"request": {
+"options": {
+}
+"url": {
+}
+}
+"raw": {
+}
+],
+"language": "json"
+"raw": "{{base_url}}/api/meals",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"meals"
+"});"
+"type": "text/javascript"
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test(\"Status code is 200\", function
+        "    pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test(\"Response has meal data\",
+        "    var jsonData = pm.response.json();",
+"
+function () {",
+},
+{
+"response": []
+"name": "Get Meal by ID",
+"event": [
+},
+"method": "GET",
+"header": [],
+"url": {
+}
+{
+"raw": "{{base_url}}/api/meals",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"meals"
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('name');",
+"
+pm.expect(jsonData.data).to.have.property('description');",
+"
+pm.expect(jsonData.data).to.have.property('price');",
+"
+pm.expect(jsonData.data).to.have.property('dateTime');",
+TMTMTMTM’"     ÒæW‡ V7B†§6öäF F æF F ’çFòæ† fRç &÷ W'G’‚vÖ „ Ö÷VçDöe  'F–6—  çG2r“2"À
+"
+pm.expect(jsonData.data).to.have.property('imageUrl');",
+" pm.expect(jsonData.data).to.have.property('cook');",
+
+" pm.expect(jsonData.data).to.have.property('participants');",
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 200', function
+        " pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test('Response has updated meal
+        " var jsonData = pm.response.json();",
+"
+data', function () {",
+},
+{
+"response": []
+"name": "Update Meal",
+"event": [
+],
+},
+}
+"request": {
+}
+{
+}
+],
+"method": "GET",
+"header": [],
+"url": {
+""
+"type": "text/javascript"
+"raw": "{{base_url}}/api/meals/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"meals",
+"1"
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('name', 'Updated Meal');",
+"
+
+pm.expect(jsonData.data).to.have.property('price', 12.99);",
+"
+pm.expect(jsonData.data).to.have.property('maxAmountOfParticipants', 10);",
+],
+}
+"request": {
+}
+],
+"method": "PUT",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"});"
+"type": "text/javascript"
+"body": {
+                            "mode": "raw",
+                            "raw": "{\n 'name': 'Updated Meal',\n 'price':
+12.99,\n 'maxAmountOfParticipants': 10\n}",
+},
+{
+"response": []
+"name": "Delete Meal",
+},
+},
+"options": {
+}
+"url": {
+}
+"raw": {
+}
+"language": "json"
+"raw": "{{base_url}}/api/meals/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"meals",
+"1"
+
+() {",
+function () {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 204', function
+        " pm.response.to.have.status(204);",
+"});",
+"",
+        "pm.test('Response has success message',
+        " var jsonData = pm.response.json();",
+"
+}
+"event": [
+],
+},
+{
+pm.expect(jsonData.message).to.contain('Meal deleted successfully');",
+}
+"request": {
+}
+],
+"method": "DELETE",
+"header": [
+],
+}
+"response": []
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/meals/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+"api",
+"meals",
+"1"
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 200', function
+        " pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test('Response has success message',
+        " var jsonData = pm.response.json();",
+"
+function () {",
+},
+{
+]
+"name": "Participate",
+"item": [
+{
+"name": "Participate in Meal",
+"event": [
+],
+{
+pm.expect(jsonData.message).to.contain('User with ID #userId is aangemeld
+voor maaltijd met ID #mealId');",
+}
+"request": {
+}
+],
+"});"
+"type": "text/javascript"
+"method": "POST",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"raw": "{{base_url}}/api/meals/1/participate",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 200', function
+        " pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test('Response has success message',
+        " var jsonData = pm.response.json();",
+"
+function () {",
+},
+{
+"response": []
+"name": "Cancel Participation",
+"event": [
+},
+}
+{
+]
+"api",
+"meals",
+"1",
+"participate"
+pm.expect(jsonData.message).to.contain('User with ID #userId is afgemeld voor
+maaltijd met ID #mealId');",
+}
+}
+"request": {
+"});"
+],
+],
+"type": "text/javascript"
+"method": "DELETE",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"raw": "{{base_url}}/api/meals/1/participate",
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 200', function
+        " pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test('Response has participants
+        " var jsonData = pm.response.json();",
+"
+data', function () {",
+},
+{
+"response": []
+"name": "Get Participants",
+"event": [
+},
+pm.expect(jsonData.data).to.be.an('array');",
+],
+}
+{
+}
+"request": {
+"host": [
+],
+]
+}
+"{{base_url}}"
+"path": [
+"api",
+"meals",
+"1",
+"participate"
+],
+"method": "GET",
+"header": [
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"});"
+"type": "text/javascript"
+
+() {",
+"listen": "test",
+"script": {
+"exec": [
+        "pm.test('Status code is 200', function
+        " pm.response.to.have.status(200);",
+"});",
+"",
+        "pm.test('Response has participant
+        " var jsonData = pm.response.json();",
+"
+details', function () {",
+},
+{
+"response": []
+"name": "Get Participant Details",
+"event": [
+},
+],
+"url": {
+}
+{
+"raw": "{{base_url}}/api/meals/1/participants",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+]
+pm.expect(jsonData.data).to.have.property('id');",
+"
+pm.expect(jsonData.data).to.have.property('firstName');",
+"
+pm.expect(jsonData.data).to.have.property('lastName');",
+"
+pm.expect(jsonData.data).to.have.property('emailAddress');",
+"
+pm.expect(jsonData.data).to.have.property('phoneNumber');",
+"
+pm.expect(jsonData.data).to.have.property('street');",
+"
+pm.expect(jsonData.data).to.have.property('city');",
+"api",
+"meals",
+"1",
+"participants"
+
+],
+}
+"event": [
+{
+},
+"listen": "prerequest",
+"script": {
+]
+}
+}
+],
+},
+}
+"request": {
+}
+"response": []
+}
+]
+"type": "text/javascript",
+"exec": [
+]
+""
+],
+"method": "GET",
+"header": [
+],
+{
+}
+"key": "Authorization",
+"value": "Bearer {{token}}",
+"type": "text"
+"url": {
+"});"
+"type": "text/javascript"
+"raw": "{{base_url}}/api/meals/1/participants/1",
+"host": [
+    "{{base_url}}"
+],
+"path": [
+"api",
+"meals",
+"1",
+"participants",
+"1"
+
+}
+],
+]
+{
+}
+"variable": [
+{
+},
+{
+}
+"key": "base_url",
+"value": "  localhost:3000",
+"type": "string"
+"key": "token",
+"value": "",
+"type": "string"
+"listen": "prerequest",
+"script": {
+}
+"type": "text/javascript",
+"exec": [
+]
+""
+
+util/config.js
+// util/config.js
+require('dotenv').config();
+const config = {
+  secretKey: process.env.SECRET_KEY
+};
+module.exports = config;
+
+util/logger.js
+const tracer = require('tracer');
+require('dotenv').config();
+const logger = tracer.colorConsole({
+  format: '{{timestamp}} <{{title}}> {{file}}:{{line}} : {{message}}',
+  dateformat: 'HH:mm:ss.L',
+  level: process.env.LOG_LEVEL || 'info',
+  preprocess: function (data) {
+    data.title = data.title.toUpperCase();
+}
+});
+module.exports = logger;
+
+validators/meal.validator.js
+const { body, param } = require('express-validator');
+const createMealValidationRules = () => [
+  body('name')
+.isString()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Invalid meal name: Must be a string between 2 and 100
+characters'),
+  body('description')
+.isString()
+    .isLength({ min: 10, max: 500 })
+    .withMessage('Invalid meal description: Must be a string between 10 and
+500 characters'),
+  body('price')
+    .isNumeric()
+    .isFloat({ min: 0.01, max: 10000 })
+    .withMessage('Invalid meal price: Must be a positive number not exceeding
+10,000'),
+  body('isActive')
+    .isBoolean()
+    .withMessage('Invalid value for isActive: Must be a boolean'),
+  body('isVega')
+    .isBoolean()
+    .withMessage('Invalid value for isVega: Must be a boolean'),
+  body('isVegan')
+    .isBoolean()
+    .withMessage('Invalid value for isVegan: Must be a boolean'),
+  body('isToTakeHome')
+];
+.isBoolean()
+.withMessage('Invalid value for isToTakeHome: Must be a boolean'),
+const updateMealValidationRules = () => [
+  body('name')
+.optional()
+.isString()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Invalid meal name: Must be a string between 2 and 100
+characters'),
+
+];
+body('description')
+.optional()
+.isString()
+    .isLength({ min: 10, max: 500 })
+    .withMessage('Invalid meal description: Must be a string between 10 and
+500 characters'),
+  body('price')
+.optional()
+    .isNumeric()
+    .isFloat({ min: 0.01, max: 10000 })
+    .withMessage('Invalid meal price: Must be a positive number not exceeding
+10,000'),
+    body('isActive')
+.optional()
+    .isBoolean()
+    .withMessage('Invalid value for isActive: Must be a boolean'),
+  body('isVega')
+.optional()
+    .isBoolean()
+    .withMessage('Invalid value for isVega: Must be a boolean'),
+  body('isVegan')
+.optional()
+    .isBoolean()
+    .withMessage('Invalid value for isVegan: Must be a boolean'),
+  body('isToTakeHome')
+.optional()
+.isBoolean()
+.withMessage('Invalid value for isToTakeHome: Must be a boolean'),
+const getMealValidationRules = () => [
+  param('mealId')
+];
+.isNumeric()
+.withMessage('Invalid meal ID: Must be a number'),
+module.exports = {
+  createMealValidationRules,
+  updateMealValidationRules,
+  getMealValidationRules,
+};
+
+validators/user.validator.js
+const { body, param } = require('express-validator');
+const createUserValidationRules = () => [
+  body('firstName')
+.isString()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Invalid first name: Must be a string between 2 and 50
+characters'),
+  body('lastName')
+.isString()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Invalid last name: Must be a string between 2 and 50
+characters'),
+  body('emailAddress')
+.isEmail()
+    .withMessage('Invalid email address: Must follow the correct email
+format'),
+  body('password')
+.isString()
+    .isLength({ min: 8 })
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).*$/)
+    .withMessage('Invalid password: Must be at least 8 characters, include at
+least one uppercase letter, one lowercase letter, one number, and one special
+character (!@#$%^&*)'),
+  body('phoneNumber')
+.optional()
+    .isMobilePhone('any')
+    .withMessage('Invalid phone number format'),
+  body('roles')
+];
+.optional()
+.isIn(['guest', 'cook', 'admin'])
+.withMessage('Invalid role. Role must be one of: guest, cook, admin'),
+const updateUserValidationRules = () => [
+  body('firstName')
+.optional()
+.isString()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Invalid first name: Must be a string between 2 and 50
+characters'),
+  body('lastName')
+
+];
+.optional()
+.isString()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Invalid last name: Must be a string between 2 and 50
+characters'),
+  body('emailAddress')
+.optional()
+.isEmail()
+    .withMessage('Invalid email address: Must follow the correct email
+format'),
+  body('password')
+.optional()
+.isString()
+    .isLength({ min: 8 })
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).*$/)
+    .withMessage('Invalid password: Must be at least 8 characters, include at
+least one uppercase letter, one lowercase letter, one number, and one special
+character (!@#$%^&*)'),
+  body('phoneNumber')
+.optional()
+    .isMobilePhone('any')
+    .withMessage('Invalid phone number format'),
+  body('roles')
+.optional()
+.isIn(['guest', 'cook', 'admin'])
+.withMessage('Invalid role. Role must be one of: guest, cook, admin'),
+const getUserValidationRules = () => [
+  param('userId')
+];
+.isNumeric()
+.withMessage('Invalid user ID: Must be a number'),
+module.exports = {
+  createUserValidationRules,
+  updateUserValidationRules,
+  getUserValidationRules,
+};
