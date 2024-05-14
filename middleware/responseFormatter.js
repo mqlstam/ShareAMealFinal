@@ -1,10 +1,8 @@
 const responseFormatter = (req, res, next) => {
-  console.log('responseFormatter middleware executed'); // Log statement
   // Save the original res.json method
   const originalJson = res.json;
   // Override res.json method
   res.json = (data) => {
-    console.log('Formatting response'); // Log statement
     // Create a formatted response object
     const formattedResponse = {
       status: res.statusCode,
