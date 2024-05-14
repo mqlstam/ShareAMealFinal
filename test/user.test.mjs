@@ -102,7 +102,7 @@ describe('Users', () => {
       };
 
       chai.request(app)
-        .put('/api/user/1')
+        .put('/api/user/5')
         .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
         .send(updatedUser)
         .end((err, res) => {
@@ -124,7 +124,7 @@ describe('Users', () => {
   describe('DELETE /api/user/:userId', () => {
     it('should delete a user', (done) => {
       chai.request(app)
-        .delete('/api/user/1')
+        .delete('/api/user/5')
         .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
         .end((err, res) => {
           logger.info(res.body);
