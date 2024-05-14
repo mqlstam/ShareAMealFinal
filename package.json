@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "mocha 'test/**/*.mjs' --exit"
-    },
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

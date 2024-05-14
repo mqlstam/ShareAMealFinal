@@ -27,4 +27,4 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-module.exports = { app }; // Export the app instance
+module.exports = app; // Directly export the app instance
