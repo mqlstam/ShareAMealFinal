@@ -1,7 +1,10 @@
 const responseFormatter = (req, res, next) => {
-  const originalSend = res.send;
+  // Save the original res.json method
+  const originalJson = res.json;
 
-  res.send = (data) => {
+  // Override res.json method
+  res.json = (data) => {
+    // Create a formatted response object
     const formattedResponse = {
       status: res.statusCode,
       message: null,
@@ -12,9 +15,22 @@ const responseFormatter = (req, res, next) => {
     if (data instanceof Error) {
       formattedResponse.message = data.message;
       formattedResponse.data = null;
+    } else if (typeof data === 'object' && data !== null) {
+      // Check if data already has a message and data property
+      if (data.message && data.data) {
+        formattedResponse.message = data.message;
+        formattedResponse.data = data.data;
+      } else {
+        // Assume the data object itself is the response data
+        formattedResponse.data = data;
+      }
+    } else if (typeof data === 'string') {
+      // If data is a string, treat it as a message
+      formattedResponse.message = data;
     }
 
-    originalSend.call(res, formattedResponse);
+    // Call the original res.json method with the formatted response
+    originalJson.call(res, formattedResponse);
   };
 
   next();

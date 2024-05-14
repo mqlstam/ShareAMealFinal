@@ -18,7 +18,7 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
-router.get("/users/profile", authenticate, userController.getProfile);
+router.get("/user/profile", authenticate, userController.getProfile);
 router.post(
   "/user",
   createUserValidationRules(),

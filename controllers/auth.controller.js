@@ -1,7 +1,8 @@
 // controllers/auth.controller.js
-const logger = require('../util/logger');
 
+const logger = require('../util/logger');
 const authService = require('../services/auth.service');
+const responseFormatter = require('../middleware/responseFormatter');
 
 const authController = {
   login: (req, res, next) => {
@@ -25,7 +26,9 @@ const authController = {
 
       // Log the successful login
       logger.info(`User ${emailAddress} logged in successfully`);
-      res.status(200).json(data);
+
+      // Format the response using responseFormatter
+      res.status(200).json({ message: 'Login successful', data });
     });
   }
 };
