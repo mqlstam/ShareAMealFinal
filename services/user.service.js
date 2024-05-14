@@ -1,4 +1,5 @@
-const userDao = require('../dao/user.dao');
+
+import userDao from '../dao/user.dao';
 
 const userService = {
   create: (user, callback) => {
@@ -24,4 +25,4 @@ const userService = {
   }
 };
 
-module.exports = userService;
+export default userService;

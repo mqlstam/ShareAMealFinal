@@ -1,8 +1,9 @@
 // routes/info.routes.js
-const express = require('express');
+import express from 'express';
+import infoController from '../controllers/info.controller.js';
+
 const router = express.Router();
-const infoController = require('../controllers/info.controller');
 
 router.get('/info', infoController.getInfo);
 
-module.exports = router;
+export default router;

@@ -1,5 +1,6 @@
 // middleware/error.js
-const logger = require('../util/logger');
+import logger from '../util/logger.js';
+
 
 const errorMiddleware = (err, req, res, next) => {
   logger.error(err.stack); // Log the error stack trace
@@ -14,4 +15,4 @@ const errorMiddleware = (err, req, res, next) => {
   });
 };
 
-module.exports = errorMiddleware;
+export default errorMiddleware;

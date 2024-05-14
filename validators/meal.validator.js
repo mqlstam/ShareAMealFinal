@@ -1,6 +1,7 @@
-const { body, param } = require('express-validator');
+// validators/meal.validator.js
+import { body, param } from 'express-validator';
 
-const createMealValidationRules = () => [
+export const createMealValidationRules = () => [
   body('name')
     .isString()
     .isLength({ min: 2, max: 100 })
@@ -16,21 +17,18 @@ const createMealValidationRules = () => [
   body('isActive')
     .isBoolean()
     .withMessage('Invalid value for isActive: Must be a boolean'),
-
   body('isVega')
     .isBoolean()
     .withMessage('Invalid value for isVega: Must be a boolean'),
-
   body('isVegan')
     .isBoolean()
     .withMessage('Invalid value for isVegan: Must be a boolean'),
-
   body('isToTakeHome')
     .isBoolean()
     .withMessage('Invalid value for isToTakeHome: Must be a boolean'),
 ];
 
-const updateMealValidationRules = () => [
+export const updateMealValidationRules = () => [
   body('name')
     .optional()
     .isString()
@@ -46,35 +44,26 @@ const updateMealValidationRules = () => [
     .isNumeric()
     .isFloat({ min: 0.01, max: 10000 })
     .withMessage('Invalid meal price: Must be a positive number not exceeding 10,000'),
-    body('isActive')
+  body('isActive')
     .optional()
     .isBoolean()
     .withMessage('Invalid value for isActive: Must be a boolean'),
-
   body('isVega')
     .optional()
     .isBoolean()
     .withMessage('Invalid value for isVega: Must be a boolean'),
-
   body('isVegan')
     .optional()
     .isBoolean()
     .withMessage('Invalid value for isVegan: Must be a boolean'),
-
   body('isToTakeHome')
     .optional()
     .isBoolean()
     .withMessage('Invalid value for isToTakeHome: Must be a boolean'),
 ];
 
-const getMealValidationRules = () => [
+export const getMealValidationRules = () => [
   param('mealId')
     .isNumeric()
     .withMessage('Invalid meal ID: Must be a number'),
 ];
-
-module.exports = {
-  createMealValidationRules,
-  updateMealValidationRules,
-  getMealValidationRules,
-};

@@ -77,4 +77,4 @@ const validateMeal = (req, res, next) => {
   next();
 };
 
-module.exports = { validateUser, validateMeal };
+export default { validateUser, validateMeal };

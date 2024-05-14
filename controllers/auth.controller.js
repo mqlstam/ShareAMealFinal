@@ -1,8 +1,7 @@
-// controllers/auth.controller.js
 
-const logger = require('../util/logger');
-const authService = require('../services/auth.service');
-const responseFormatter = require('../middleware/responseFormatter');
+import logger from '../util/logger';
+import authService from '../services/auth.service';
+import responseFormatter from '../middleware/responseFormatter';
 
 const authController = {
   login: (req, res, next) => {
@@ -33,4 +32,4 @@ const authController = {
   }
 };
 
-module.exports = authController;
+export default authController;

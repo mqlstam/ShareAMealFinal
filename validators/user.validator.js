@@ -1,6 +1,7 @@
-const { body, param } = require('express-validator');
+// validators/user.validator.js
+import { body, param } from 'express-validator';
 
-const createUserValidationRules = () => [
+export const createUserValidationRules = () => [
   body('firstName')
     .isString()
     .isLength({ min: 2, max: 50 })
@@ -18,16 +19,16 @@ const createUserValidationRules = () => [
     .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).*$/)
     .withMessage('Invalid password: Must be at least 8 characters, include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)'),
   body('phoneNumber')
-    .optional() 
+    .optional()
     .isMobilePhone('any')
     .withMessage('Invalid phone number format'),
   body('roles')
-    .optional() 
+    .optional()
     .isIn(['guest', 'cook', 'admin'])
     .withMessage('Invalid role. Role must be one of: guest, cook, admin'),
 ];
 
-const updateUserValidationRules = () => [
+export const updateUserValidationRules = () => [
   body('firstName')
     .optional()
     .isString()
@@ -52,22 +53,14 @@ const updateUserValidationRules = () => [
     .optional()
     .isMobilePhone('any')
     .withMessage('Invalid phone number format'),
-
   body('roles')
     .optional()
     .isIn(['guest', 'cook', 'admin'])
     .withMessage('Invalid role. Role must be one of: guest, cook, admin'),
 ];
 
-
-const getUserValidationRules = () => [
+export const getUserValidationRules = () => [
   param('userId')
     .isNumeric()
     .withMessage('Invalid user ID: Must be a number'),
 ];
-
-module.exports = {
-  createUserValidationRules,
-  updateUserValidationRules,
-  getUserValidationRules,
-};

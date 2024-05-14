@@ -1,30 +1,31 @@
 // index.js
+import express from 'express';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import mealRoutes from './routes/meal.routes.js';
+import infoRoutes from './routes/info.routes.js';
+import responseFormatter from './middleware/responseFormatter.js';
+import errorMiddleware from './middleware/error.js';
 
-const express = require('express');
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3000;
-const authRoutes = require('./routes/auth.routes');
-const userRoutes = require('./routes/user.routes');
-const mealRoutes = require('./routes/meal.routes');
-const infoRoutes = require('./routes/info.routes');
-const responseFormatter = require('./middleware/responseFormatter');
-const errorMiddleware = require('./middleware/error');
 
 app.use(express.json());
-app.use(responseFormatter); 
+app.use(responseFormatter);
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
 app.use('/api', infoRoutes);
-
 app.get('/', (req, res) => {
   res.send('Share-a-Meal API is running!');
 });
-
-app.use(errorMiddleware); // Use errorMiddleware after route handlers
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-module.exports = app; // Directly export the app instance
+export default app;

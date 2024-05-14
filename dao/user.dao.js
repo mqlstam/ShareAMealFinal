@@ -1,4 +1,4 @@
-const db = require('../mysql-db');
+import db from '../mysql-db.js';
 
 const userDao = {
   create: (user, callback) => {
@@ -125,4 +125,4 @@ const userDao = {
   }
 };
 
-module.exports = userDao;
+export default userDao;

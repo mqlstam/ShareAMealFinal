@@ -1,5 +1,5 @@
-const logger = require('../util/logger');
-const userService = require('../services/user.service');
+import logger from '../util/logger';
+import userService from '../services/user.service';
 
 const userController = {
   create: (req, res, next) => {
@@ -114,4 +114,4 @@ const userController = {
   }
 };
 
-module.exports = userController;
+export default userController;

@@ -1,4 +1,5 @@
-const db = require('../mysql-db');
+import db from '../mysql-db.js';
+
 
 const mealDao = {
   create: (meal, callback) => {
@@ -147,4 +148,4 @@ const mealDao = {
 
 };
 
-module.exports = mealDao;
+export default mealDao;

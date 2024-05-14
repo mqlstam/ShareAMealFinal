@@ -1,6 +1,8 @@
-const jwt = require('jsonwebtoken');
-const userDao = require('../dao/user.dao');
-const config = require('../util/config'); 
+
+
+import jwt from 'jsonwebtoken';
+import userDao from '../dao/user.dao';
+import config from '../util/config';
 
 const authService = {
   login: (emailAddress, password, callback) => {
@@ -19,4 +21,4 @@ const authService = {
   }
 };
 
-module.exports = authService;
+export default authService;

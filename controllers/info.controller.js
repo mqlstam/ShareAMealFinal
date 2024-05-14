@@ -1,7 +1,5 @@
 // controllers/info.controller.js
-
-const logger = require('../util/logger');
-
+import logger from '../util/logger';
 const infoController = {
   getInfo: (req, res) => {
     const systemInfo = {
@@ -18,4 +16,4 @@ const infoController = {
   }
 };
 
-module.exports = infoController;
+export default infoController;

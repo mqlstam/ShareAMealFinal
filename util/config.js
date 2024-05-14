@@ -1,8 +1,8 @@
 // util/config.js
-require('dotenv').config();
+import dotenv from 'dotenv';
 
 const config = {
   secretKey: process.env.SECRET_KEY
 };
 
-module.exports = config;
+export default config;

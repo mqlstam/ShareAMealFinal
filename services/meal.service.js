@@ -1,4 +1,5 @@
-const mealDao = require('../dao/meal.dao');
+
+import mealDao from '../dao/meal.dao';
 
 const mealService = {
   create: (meal, callback) => {
@@ -106,4 +107,4 @@ const mealService = {
   },
 };
 
-module.exports = mealService;
+export default mealService;

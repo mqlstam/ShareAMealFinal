@@ -1,7 +1,8 @@
 // controllers/meal.controller.js
 
-const logger = require('../util/logger');
-const mealService = require('../services/meal.service');
+
+import logger from '../util/logger';
+import mealService from '../services/meal.service';
 
 const mealController = {
   create: (req, res, next) => {
@@ -151,4 +152,4 @@ const mealController = {
   }
 };
 
-module.exports = mealController;
+export default mealController;
