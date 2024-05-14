@@ -13,6 +13,7 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const mealRoutes = require('./routes/meal.routes');
 const infoRoutes = require('./routes/info.routes');
+const responseFormatter = require('./middleware/responseFormatter');
 
 
 app.use(express.json());
@@ -31,5 +32,9 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+app.use(responseFormatter);
+
 app.use(express.json());
 app.use(errorMiddleware);
+
+
