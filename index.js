@@ -9,7 +9,7 @@ const responseFormatter = require('./middleware/responseFormatter');
 const errorMiddleware = require('./middleware/error');
 
 app.use(express.json());
-app.use(responseFormatter); // Use responseFormatter middleware
+app.use(responseFormatter); 
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
