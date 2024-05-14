@@ -17,7 +17,7 @@ const authenticate = (req, res, next) => {
       return res.status(403).json({ message: 'Failed to authenticate token' });
     }
 
-    req.user = decoded;
+    req.user = { ...decoded, userId: +decoded.userId };  // Convert userId to a number
     next();
   });
 };

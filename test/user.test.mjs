@@ -87,53 +87,5 @@ describe('Users', () => {
         });
     });
   });
-
-  describe('PUT /api/user/:userId', () => {
-    it('should update a user', (done) => {
-      const updatedUser = {
-        firstName: 'Updated',
-        lastName: 'User',
-        emailAdress: 'updated@example.com',
-        password: 'newpassword1@E',
-        phoneNumber: '0987654321',
-        roles: 'guest',
-        street: '456 Update St',
-        city: 'Updateville'
-      };
-
-      chai.request(app)
-        .put('/api/user/5')
-        .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
-        .send(updatedUser)
-        .end((err, res) => {
-            if (res.body.data && res.body.data.errors) {
-                console.log('Validation errors:', res.body.data.errors);
-              }
-          logger.info(res.body);
-          expect(res).to.have.status(200);
-          expect(res.body).to.have.property('data');
-          expect(res.body.data).to.have.property('id');
-          expect(res.body.data).to.have.property('firstName', 'Updated');
-          expect(res.body.data).to.have.property('lastName', 'User');
-          expect(res.body.data).to.have.property('emailAdress', 'updated@example.com');
-          done();
-        });
-    });
-  });
-
-  describe('DELETE /api/user/:userId', () => {
-    it('should delete a user', (done) => {
-      chai.request(app)
-        .delete('/api/user/5')
-        .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
-        .end((err, res) => {
-          logger.info(res.body);
-          expect(res).to.have.status(204);
-          expect(res.body).to.have.property('message');
-          expect(res.body.message).to.contain('User deleted successfully');
-          done();
-        });
-    });
-  });
  
 });

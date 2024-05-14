@@ -34,7 +34,8 @@ const userController = {
   },
 
   getById: (req, res, next) => {
-    const userId = req.params.userId;
+    const userId = +req.user.userId; 
+    
     logger.info(`Retrieving user: ${userId}`);
     userService.getById(userId, (error, data) => {
       if (error) {
@@ -51,9 +52,9 @@ const userController = {
   },
 
   update: (req, res, next) => {
-    const userId = req.params.userId;
+    const userId = +req.user.userId; 
     const updatedUser = req.body;
-    const authenticatedUserId = req.user.userId;
+    const authenticatedUserId = +req.user.userId;
     if (userId !== authenticatedUserId) {
       return res.status(403).json({ message: 'You are not authorized to update this user' });
     }
@@ -73,9 +74,12 @@ const userController = {
   },
 
   delete: (req, res, next) => {
-    const userId = req.params.userId;
-    const authenticatedUserId = req.user.userId;
+    const userId = +req.user.userId;     
+
+    const authenticatedUserId = +req.user.userId;
     if (userId !== authenticatedUserId) {
+      console.log('You are not authorized to delete this user');
+
       return res.status(403).json({ message: 'You are not authorized to delete this user' });
     }
     logger.info(`Deleting user: ${userId}`);
@@ -94,7 +98,7 @@ const userController = {
   },
 
   getProfile: (req, res, next) => {
-    const userId = req.user.userId;
+    const userId = +req.user.userId; 
     if (typeof userId !== 'number') {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
