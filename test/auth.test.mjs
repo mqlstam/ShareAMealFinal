@@ -10,8 +10,8 @@ describe('Authentication', () => {
   describe('POST /api/login', () => {
     it('should return a token when valid credentials are provided', (done) => {
       const validCredentials = {
-        emailAddress: 'valid@example.com',
-        password: 'validPassword',
+        emailAddress: 'j.doe@server.com',
+        password: 'secret',
       };
 
       chai.request(app)
