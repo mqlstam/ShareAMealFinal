@@ -1,5 +1,3 @@
-// controllers/user.controller.js
-
 const logger = require('../util/logger');
 const userService = require('../services/user.service');
 
@@ -16,6 +14,7 @@ const userController = {
       res.status(201).json({ message: 'User created successfully', data });
     });
   },
+
   getAll: (req, res, next) => {
     const filters = {
       firstName: req.query.firstName,
@@ -33,6 +32,7 @@ const userController = {
       res.status(200).json({ message: 'Users retrieved successfully', data });
     });
   },
+
   getById: (req, res, next) => {
     const userId = req.params.userId;
     logger.info(`Retrieving user: ${userId}`);
@@ -49,6 +49,7 @@ const userController = {
       res.status(200).json({ message: 'User retrieved successfully', data });
     });
   },
+
   update: (req, res, next) => {
     const userId = req.params.userId;
     const updatedUser = req.body;
@@ -70,6 +71,7 @@ const userController = {
       res.status(200).json({ message: 'User updated successfully', data });
     });
   },
+
   delete: (req, res, next) => {
     const userId = req.params.userId;
     const authenticatedUserId = req.user.userId;
@@ -90,6 +92,7 @@ const userController = {
       res.status(204).json({ message: 'User deleted successfully', data });
     });
   },
+
   getProfile: (req, res, next) => {
     const userId = req.user.userId;
     if (typeof userId !== 'number') {
