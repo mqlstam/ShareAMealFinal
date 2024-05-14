@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../index.js';
+import logger from '../util/logger.js';
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -18,6 +19,7 @@ describe('Authentication', () => {
         .post('/api/login')
         .send(validCredentials)
         .end((err, res) => {
+          logger.info(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('token');
