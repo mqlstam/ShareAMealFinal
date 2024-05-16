@@ -4,7 +4,6 @@ import userService from '../services/user.service.js';
 const userController = {
   create: (req, res, next) => {
     const user = req.body;
-    logger.info('Creating new user', user);
     userService.create(user, (error, data) => {
       if (error) {
         logger.error(`Error creating user: ${error.message}`);
@@ -22,7 +21,6 @@ const userController = {
       emailAddress: req.query.emailAddress,
       roles: req.query.roles
     };
-    logger.info('Retrieving users with filters', filters);
     userService.getAllFiltered(filters, (error, data) => {
       if (error) {
         logger.error(`Error retrieving users: ${error.message}`);
@@ -78,7 +76,6 @@ const userController = {
 
     const authenticatedUserId = +req.user.userId;
     if (userId !== authenticatedUserId) {
-      console.log('You are not authorized to delete this user');
 
       return res.status(403).json({ message: 'You are not authorized to delete this user' });
     }

@@ -45,9 +45,7 @@ describe('Meals', () => {
         .end((err, res) => {
           if (err) {
             logger.error('Error creating meal:', err);
-          } else {
-            logger.info('Meal creation response:', res.body);
-          }
+          } 
           expect(res).to.have.status(201);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('id');
@@ -69,8 +67,6 @@ describe('Meals', () => {
         .end((err, res) => {
           if (err) {
             logger.error('Error getting all meals:', err);
-          } else {
-            logger.info('Get all meals response:', res.body);
           }
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
@@ -88,9 +84,7 @@ describe('Meals', () => {
         .end((err, res) => {
           if (err) {
             logger.error('Error getting meal by ID:', err);
-          } else {
-            logger.info('Get meal by ID response:', res.body);
-          }
+          } 
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('id');
@@ -127,9 +121,7 @@ describe('Meals', () => {
         .end((err, res) => {
           if (err) {
             logger.error('Error updating meal:', err);
-          } else {
-            logger.info('Update meal response:', res.body);
-          }
+          } 
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('id');
@@ -152,9 +144,7 @@ describe('Meals', () => {
         .end((err, res) => {
           if (err) {
             logger.error('Error deleting meal:', err);
-          } else {
-            logger.info('Delete meal response:', res.body);
-          }
+          } 
           expect(res).to.have.status(204);
           done();
         });

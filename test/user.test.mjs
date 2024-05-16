@@ -43,7 +43,6 @@ describe('Users', () => {
         .get('/api/user')
         .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
         .end((err, res) => {
-          logger.info(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.be.an('array');
@@ -58,7 +57,6 @@ describe('Users', () => {
         .get('/api/user/profile')
         .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
         .end((err, res) => {
-          logger.info(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('id');
@@ -76,7 +74,6 @@ describe('Users', () => {
         .get('/api/user/1')
         .set('Authorization', `Bearer ${process.env.TEST_TOKEN}`)
         .end((err, res) => {
-          logger.info(res.body);
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data).to.have.property('id');
