@@ -3,11 +3,14 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import config from '../util/config.js';  // Import the config object
 import server from '../index.js';
+import { describe, it, before } from 'mocha';
+
 
 
 
 chai.use(chaiHttp);
 const expect = chai.expect;
+chai.should();  // Initialize should
 
 
 describe('UC-301 Toevoegen van maaltijden', () => {

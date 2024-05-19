@@ -60,13 +60,13 @@ INSERT INTO `meal` VALUES
 UNLOCK TABLES;
 
 --
--- Table structure for table `meal_participants_user`
+-- Table structure for table `meal_participant`
 --
 
-DROP TABLE IF EXISTS `meal_participants_user`;
+DROP TABLE IF EXISTS `meal_participant`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `meal_participants_user` (
+CREATE TABLE `meal_participant` (
   `mealId` int NOT NULL,
   `userId` int NOT NULL,
   PRIMARY KEY (`mealId`,`userId`),
@@ -78,12 +78,12 @@ CREATE TABLE `meal_participants_user` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `meal_participants_user`
+-- Dumping data for table `meal_participant`
 --
 
-LOCK TABLES `meal_participants_user` WRITE;
-/*!40000 ALTER TABLE `meal_participants_user` DISABLE KEYS */;
-INSERT INTO `meal_participants_user` VALUES 
+LOCK TABLES `meal_participant` WRITE;
+/*!40000 ALTER TABLE `meal_participant` DISABLE KEYS */;
+INSERT INTO `meal_participant` VALUES 
 (1,2),
 (1,3),
 (1,5),
@@ -92,7 +92,7 @@ INSERT INTO `meal_participants_user` VALUES
 (3,4),
 (4,2),
 (5,4);
-/*!40000 ALTER TABLE `meal_participants_user` ENABLE KEYS */;
+/*!40000 ALTER TABLE `meal_participant` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
