@@ -1,5 +1,5 @@
-// validators/meal.validator.js
 import { body, param } from 'express-validator';
+import moment from 'moment';
 
 export const createMealValidationRules = () => [
   body('name')
@@ -26,6 +26,9 @@ export const createMealValidationRules = () => [
   body('isToTakeHome')
     .isBoolean()
     .withMessage('Invalid value for isToTakeHome: Must be a boolean'),
+  body('dateTime')
+    .custom((value) => moment(value).isAfter(moment()))
+    .withMessage('Invalid meal date and time: Must be a future date and time'),
 ];
 
 export const updateMealValidationRules = () => [

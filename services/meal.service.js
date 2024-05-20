@@ -81,10 +81,17 @@ const mealService = {
       callback(error, null);
     }
   },
-
   getParticipants: (mealId, callback) => {
     try {
-      mealDao.getParticipants(mealId, callback);
+      mealDao.getById(mealId, (error, meal) => {
+        if (error) {
+          return callback(error, null);
+        }
+        if (!meal) {
+          return callback({ message: 'Meal not found', statusCode: 404 }, null);
+        }
+        mealDao.getParticipants(mealId, callback);
+      });
     } catch (error) {
       callback(error, null);
     }

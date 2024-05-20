@@ -1,6 +1,3 @@
-// controllers/meal.controller.js
-
-
 import logger from '../util/logger.js';
 import mealService from '../services/meal.service.js';
 
@@ -33,40 +30,68 @@ const mealController = {
     logger.info(`Retrieving meal: ${mealId}`);
     mealService.getById(mealId, (error, data) => {
       if (error) {
+        // Check if the error indicates that the meal was not found
+        if (error.message === 'Meal not found') {
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+        }
         logger.error(`Error retrieving meal: ${error.message}`);
         return next(error);
       }
       if (!data) {
         logger.warn(`Meal not found: ${mealId}`);
-        return res.status(404).json({ message: 'Meal not found' });
+        return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
       }
       logger.info(`Meal retrieved: ${mealId}`);
       res.status(200).json({ message: 'Meal retrieved successfully', data });
     });
   },
-  update: (req, res, next) => {
+  update: (req, res) => {
     const mealId = +req.params.mealId;
     const updatedMeal = req.body;
     const authenticatedUserId = +req.user.userId;
+  
+    // First, retrieve the cook ID to check authorization
     mealService.getCookId(mealId, (error, cookId) => {
       if (error) {
-        return next(error);
+        // Check if the error indicates that the meal was not found
+        if (error.message === 'Meal not found') {
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+        }
+        // Log and return a 500 Internal Server Error if any other error occurs
+        logger.error(`Error retrieving cook ID for meal ${mealId}: ${error.message}`);
+        return res.status(500).json({ status: 500, message: 'Internal Server Error', data: {} });
       }
+  
+      // Check if the authenticated user is the cook
       if (cookId !== authenticatedUserId) {
-        return res.status(403).json({ message: 'You are not authorized to update this meal' });
+        return res.status(403).json({ status: 403, message: 'You are not authorized to update this meal', data: {} });
       }
-      logger.info(`Updating meal: ${mealId}`);
+  
+      // Proceed to update the meal
+      logger.info(`User ${authenticatedUserId} is updating meal ${mealId}`);
       mealService.update(mealId, updatedMeal, (error, data) => {
         if (error) {
-          logger.error(`Error updating meal: ${error.message}`);
-          return next(error);
+          // Check if the error indicates that the meal was not found
+          if (error.message === 'Meal not found') {
+            logger.warn(`Meal not found: ${mealId}`);
+            return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+          }
+          // Log and return a 500 Internal Server Error if any other error occurs
+          logger.error(`Error updating meal ${mealId}: ${error.message}`);
+          return res.status(500).json({ status: 500, message: 'Internal Server Error', data: {} });
         }
+  
+        // Handle the case where the meal does not exist
         if (!data) {
           logger.warn(`Meal not found: ${mealId}`);
-          return res.status(404).json({ message: 'Meal not found' });
+          return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
         }
-        logger.info(`Meal updated: ${mealId}`);
-        res.status(200).json({ message: 'Meal updated successfully', data });
+  
+        // Successful update
+        logger.info(`Meal ${mealId} updated successfully`);
+        res.status(200).json({ status: 200, message: 'Meal updated successfully', data });
       });
     });
   },
@@ -126,6 +151,11 @@ const mealController = {
     logger.info(`Retrieving participants for meal: ${mealId}`);
     mealService.getParticipants(mealId, (error, data) => {
       if (error) {
+        // Check if the error indicates that the meal was not found
+        if (error.message === 'Meal not found') {
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+        }
         logger.error(`Error retrieving participants: ${error.message}`);
         return next(error);
       }

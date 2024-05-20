@@ -1,6 +1,7 @@
 const responseFormatter = (req, res, next) => {
   // Save the original res.json method
   const originalJson = res.json;
+
   // Override res.json method
   res.json = (data) => {
     // Create a formatted response object
@@ -9,12 +10,16 @@ const responseFormatter = (req, res, next) => {
       message: null,
       data: null,
     };
+
     // If the data is an instance of Error, handle it differently
     if (data instanceof Error) {
       formattedResponse.message = data.message;
+    } else if (data && data.errors && Array.isArray(data.errors)) {
+      // Handle validation errors from express-validator
+      formattedResponse.message = data.errors[data.errors.length - 1].msg;
     } else if (typeof data === 'object' && data !== null) {
-      // Check if data already has a message and data property
       if (data.message && data.data) {
+        // If data has a message and data property, use them
         formattedResponse.message = data.message;
         formattedResponse.data = data.data;
       } else if (data.message) {
@@ -28,9 +33,11 @@ const responseFormatter = (req, res, next) => {
       // If data is a string, treat it as a message
       formattedResponse.message = data;
     }
+
     // Call the original res.json method with the formatted response
     originalJson.call(res, formattedResponse);
   };
+
   next();
 };
 
