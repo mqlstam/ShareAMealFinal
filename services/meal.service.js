@@ -37,9 +37,13 @@ const mealService = {
   delete: (id, callback) => {
     try {
       mealDao.delete(id, (error, data) => {
-        // Pass the error to the callback
-        if (error) { 
-          return callback(error, null); 
+        if (error) {
+          // If the error is "Meal not found", return a 404 error
+          if (error.message === 'Meal not found') {
+            return callback({ message: 'Meal not found', statusCode: 404 }, null);
+          }
+          // Pass other errors to the callback
+          return callback(error, null);
         }
         callback(null, data);
       });

@@ -619,7 +619,6 @@ describe('UC-301 Toevoegen van maaltijden', () => {
             done();
           });
       });
-
       it('TC-305-3 Te verwijderen maaltijd bestaat niet', (done) => {
         const invalidMealId = 999;
         chai
@@ -703,15 +702,16 @@ describe('UC-301 Toevoegen van maaltijden', () => {
               .request(server)
               .delete(`/api/meals/${invalidMealId}`)
               .set('Authorization', `Bearer ${token}`)
-            .end((err, res) => {
-            console.log('Status:', res.status);
-            console.log('Response Body:', res.body);
-  res.should.have.status(404);
+              .end((err, res) => {
+                console.log('Status:', res.status);
+                console.log('Response Body:', res.body);
+                res.should.have.status(404);
                 res.body.should.have.property('message').eql('Meal not found');
                 done();
               });
           });
         });
+    
       });
     });
   });

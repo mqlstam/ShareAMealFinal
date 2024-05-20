@@ -69,7 +69,8 @@ const mealDao = {
       }
       if (result.affectedRows === 0) {
         // Return an error explicitly
-        return callback(new Error('Meal not found'), null); 
+        // return callback(new Error('Meal not found'), null);
+        return callback({ message: 'Meal not found' }, null); // Change this line
       }
       callback(null, { message: 'Meal deleted successfully' });
     });
