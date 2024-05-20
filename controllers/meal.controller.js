@@ -1,3 +1,5 @@
+// controllers/meal.controller.js
+
 import logger from '../util/logger.js';
 import mealService from '../services/meal.service.js';
 
@@ -40,7 +42,8 @@ const mealController = {
       }
       if (!data) {
         logger.warn(`Meal not found: ${mealId}`);
-        return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+        return res.status(404).json({ status: 404, message: 'Meal not found',
+data: {} });
       }
       logger.info(`Meal retrieved: ${mealId}`);
       res.status(200).json({ message: 'Meal retrieved successfully', data });
@@ -50,7 +53,7 @@ const mealController = {
     const mealId = +req.params.mealId;
     const updatedMeal = req.body;
     const authenticatedUserId = +req.user.userId;
-  
+
     // First, retrieve the cook ID to check authorization
     mealService.getCookId(mealId, (error, cookId) => {
       if (error) {
@@ -59,16 +62,18 @@ const mealController = {
           logger.warn(`Meal not found: ${mealId}`);
           return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
         }
-        // Log and return a 500 Internal Server Error if any other error occurs
-        logger.error(`Error retrieving cook ID for meal ${mealId}: ${error.message}`);
+        // Log and return a 500 Internal Server Error if any other error
+occurs
+        logger.error(`Error retrieving cook ID for meal ${mealId}:
+${error.message}`);
         return res.status(500).json({ status: 500, message: 'Internal Server Error', data: {} });
       }
-  
+
       // Check if the authenticated user is the cook
       if (cookId !== authenticatedUserId) {
         return res.status(403).json({ status: 403, message: 'You are not authorized to update this meal', data: {} });
       }
-  
+
       // Proceed to update the meal
       logger.info(`User ${authenticatedUserId} is updating meal ${mealId}`);
       mealService.update(mealId, updatedMeal, (error, data) => {
@@ -82,13 +87,13 @@ const mealController = {
           logger.error(`Error updating meal ${mealId}: ${error.message}`);
           return res.status(500).json({ status: 500, message: 'Internal Server Error', data: {} });
         }
-  
+
         // Handle the case where the meal does not exist
         if (!data) {
           logger.warn(`Meal not found: ${mealId}`);
           return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
         }
-  
+
         // Successful update
         logger.info(`Meal ${mealId} updated successfully`);
         res.status(200).json({ status: 200, message: 'Meal updated successfully', data });
@@ -100,7 +105,7 @@ const mealController = {
     const authenticatedUserId = +req.user.userId;
     mealService.getCookId(mealId, (error, cookId) => {
       if (error) {
-        return next(error);
+        return next(error); // Pass the error to the error middleware
       }
       if (cookId !== authenticatedUserId) {
         return res.status(403).json({ message: 'You are not authorized to delete this meal' });
@@ -108,15 +113,16 @@ const mealController = {
       logger.info(`Deleting meal: ${mealId}`);
       mealService.delete(mealId, (error, data) => {
         if (error) {
-          logger.error(`Error deleting meal: ${error.message}`);
-          return next(error);
-        }
-        if (!data) {
-          logger.warn(`Meal not found: ${mealId}`);
-          return res.status(404).json({ message: 'Meal not found' });
+          if (error.message === 'Meal not found') {
+            logger.warn(`Meal not found: ${mealId}`);
+            return res.status(404).json({ message: 'Meal not found' });
+          } else {
+            logger.error(`Error deleting meal: ${error.message}`);
+            return next(error); // Pass other errors to the error middleware
+          }
         }
         logger.info(`Meal deleted: ${mealId}`);
-        res.status(204).json({ message: 'Meal deleted successfully', data });
+        res.status(204).send(); 
       });
     });
   },
@@ -139,7 +145,7 @@ const mealController = {
     logger.info(`User ${userId} canceling participation in meal: ${mealId}`);
     mealService.cancelParticipation(userId, mealId, (error, data) => {
       if (error) {
-        logger.error(`Error canceling participation in meal: ${error.message}`);
+        logger.error(`Error canceling participation in meal: ${error.message} `);
         return next(error);
       }
       logger.info(`User ${userId} canceled participation in meal: ${mealId}`);
@@ -168,18 +174,19 @@ const mealController = {
     const participantId = +req.params.participantId;
     logger.info(`Retrieving participant details for meal: ${mealId}, participant: ${participantId}`);
     mealService.getParticipantDetails(mealId, participantId, (error, data) => {
-      if (error) {
-        logger.error(`Error retrieving participant details: ${error.message}`);
-        return next(error);
-      }
-      if (!data) {
-        logger.warn(`Participant not found: ${participantId}`);
-        return res.status(404).json({ message: 'Participant not found' });
-      }
-      logger.info(`Participant details retrieved for meal: ${mealId}, participant: ${participantId}`);
-      res.status(200).json({ message: 'Participant details retrieved successfully', data });
-    });
-  }
-};
-
-export default mealController;
+        if (error) {
+          logger.error(`Error retrieving participant details: ${error.message}
+  `);
+          return next(error);
+        }
+        if (!data) {
+          logger.warn(`Participant not found: ${participantId}`);
+          return res.status(404).json({ message: 'Participant not found' });
+        }
+        logger.info(`Participant details retrieved for meal: ${mealId},  participant: ${participantId}`);
+        res.status(200).json({ message: 'Participant details retrieved successfully', data });
+      });
+    }
+  };
+  
+  export default mealController;

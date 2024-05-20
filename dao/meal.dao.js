@@ -1,5 +1,6 @@
-import db from '../mysql-db.js';
+// dao/meal.dao.js
 
+import db from '../mysql-db.js';
 
 const mealDao = {
   create: (meal, callback) => {
@@ -67,7 +68,8 @@ const mealDao = {
         return callback(error, null);
       }
       if (result.affectedRows === 0) {
-        return callback({ message: 'Meal not found' }, null);
+        // Return an error explicitly
+        return callback(new Error('Meal not found'), null); 
       }
       callback(null, { message: 'Meal deleted successfully' });
     });

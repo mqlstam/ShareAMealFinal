@@ -36,7 +36,13 @@ const mealService = {
 
   delete: (id, callback) => {
     try {
-      mealDao.delete(id, callback);
+      mealDao.delete(id, (error, data) => {
+        // Pass the error to the callback
+        if (error) { 
+          return callback(error, null); 
+        }
+        callback(null, data);
+      });
     } catch (error) {
       callback(error, null);
     }

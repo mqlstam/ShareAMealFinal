@@ -1,3 +1,4 @@
+
 import db from '../mysql-db.js';
 
 const userDao = {
@@ -9,7 +10,7 @@ const userDao = {
       user.emailAddress,
       user.password,
       user.phoneNumber,
-      user.roles,
+      user.roles, // Assuming roles is a comma-separated string
       user.street,
       user.city
     ];
