@@ -2,8 +2,10 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import config from '../util/config.js';  // Import the config object
+import config from '../util/config.js';  
 import server from '../index.js';
+
+
 import { describe, it, before, afterEach } from 'mocha';
 
 chai.use(chaiHttp);
@@ -18,6 +20,7 @@ describe('UC-301 Toevoegen van maaltijden', () => {
     token = jwt.sign({ userId: 1 }, config.secretKey);
     done();
   });
+
 
   it('TC-301-1 Verplicht veld ontbreekt', (done) => {
     chai
@@ -81,7 +84,6 @@ describe('UC-301 Toevoegen van maaltijden', () => {
         isVega: 0,
         isVegan: 0,
         isToTakeHome: 1,
-        cookId: 1, // Add cookId to the request body
       })
       .end((err, res) => {
         res.should.have.status(201);
@@ -456,6 +458,7 @@ describe('UC-305 Verwijderen van maaltijd', () => {
             });
         });
     });
+
   
     it('TC-402-1 Niet ingelogd', (done) => {
       chai
