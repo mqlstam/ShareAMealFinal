@@ -61,12 +61,21 @@ const mealService = {
         if (!meal) {
           return callback({ message: 'Meal not found' }, null);
         }
-
-        if (meal.participants && meal.participants.length >= meal.maxAmountOfParticipants) {
-          return callback({ message: 'Maximum number of participants reached' }, null);
-        }
-
-        mealDao.participate(userId, mealId, callback);
+  
+        // Get the current number of participants
+        mealDao.getParticipants(mealId, (error, participants) => {
+          if (error) {
+            return callback(error, null);
+          }
+  
+          // Check if the maximum number of participants has been reached
+          if (participants.length >= meal.maxAmountOfParticipants) {
+            return callback({ message: 'Maximum number of participants reached' }, null);
+          }
+  
+          // If the maximum hasn't been reached, allow the new participant to join
+          mealDao.participate(userId, mealId, callback);
+        });
       });
     } catch (error) {
       callback(error, null);

@@ -130,17 +130,25 @@ const mealController = {
   participate: (req, res, next) => {
     const mealId = +req.params.mealId;
     const userId = +req.user.userId;
-
+  
     logger.info(`User ${userId} participating in meal: ${mealId}`);
+
+    // check max participants
+    
+
     mealService.participate(userId, mealId, (error, data) => {
       if (error) {
+        if (error.message === 'Meal not found') {
+          logger.warn(`Meal not found: ${mealId}`);
+          return res.status(404).json({ status: 404, message: 'Meal not found', data: {} });
+        }
         logger.error(`Error participating in meal: ${error.message}`);
         return next(error);
       }
       logger.info(`User ${userId} participated in meal: ${mealId}`);
       res.status(200).json({ message: 'Participation successful', data });
     });
-  },
+  },  
 
   cancelParticipation: (req, res, next) => {
     const mealId = +req.params.mealId;

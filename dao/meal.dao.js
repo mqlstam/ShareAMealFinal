@@ -75,17 +75,50 @@ const mealDao = {
       callback(null, { message: 'Meal deleted successfully' });
     });
   },
-  participate: (userId, mealId, callback) => {
-    const query = 'INSERT INTO meal_participant (userId, mealId) VALUES (?, ?)';
-    const values = [userId, mealId];
 
-    db.query(query, values, (error, result) => {
+participate: (userId, mealId, callback) => {
+  // First, get the meal details
+  const getMealQuery = 'SELECT * FROM meal WHERE id = ?';
+  db.query(getMealQuery, [mealId], (error, mealResult) => {
+    if (error) {
+      return callback(error, null);
+    }
+    if (mealResult.length === 0) {
+      return callback({ message: 'Meal not found' }, null);
+    }
+
+    const meal = mealResult[0];
+
+    // Get the actual participants associated with the meal
+    const getParticipantsQuery = `
+      SELECT COUNT(*) AS participantCount
+      FROM meal_participant
+      WHERE mealId = ?
+    `;
+    db.query(getParticipantsQuery, [mealId], (error, participantResult) => {
       if (error) {
         return callback(error, null);
       }
-      callback(null, { message: `User ${userId} has joined meal ${mealId}` });
+
+      const participantCount = participantResult[0].participantCount;
+
+      // Check if the maximum number of participants has been reached
+      if (participantCount >= meal.maxAmountOfParticipants) {
+        return callback({ message: 'Maximum number of participants reached' }, null);
+      }
+
+      // If the maximum hasn't been reached, insert the new participant
+      const insertQuery = 'INSERT INTO meal_participant (userId, mealId) VALUES (?, ?)';
+      const values = [userId, mealId];
+      db.query(insertQuery, values, (error, result) => {
+        if (error) {
+          return callback(error, null);
+        }
+        callback(null, { message: `User ${userId} has joined meal ${mealId}` });
+      });
     });
-  },
+  });
+},
 
   cancelParticipation: (userId, mealId, callback) => {
     const query = 'DELETE FROM meal_participant WHERE userId = ? AND mealId = ?';
